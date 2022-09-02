@@ -1,0 +1,320 @@
+.desktop .my-portal .navbar .btn-bars {
+    color: #fff;
+}
+
+.desktop .my-portal .nav > li > a {
+    color: #fff;
+}
+
+.desktop .my-portal .sub-portal:not(.sub-collapse) .menu-app li > a:hover {
+    color: #4088fe;
+    background-color: #f5f5f5;
+}
+
+.desktop .sub-collapse .menu-app > li:hover > a {
+    color: #4088fe;
+    background-color: #f5f5f5;
+}
+
+.desktop .sub-portal .menu-app ul > li:hover > a {
+    color: #4088fe;
+    background-color: #f5f5f5;
+}
+
+.desktop .sub-portal .menu-app li.active > a {
+    color: #4088fe !important;
+    background: #f5f5f5 !important;
+}
+
+.desktop .sub-portal .menu-app li > a:before {
+    background: #2b71fb;
+}
+
+.desktop .top-profile > a {
+    color: #fff;
+}
+
+.desktop .my-portal .container {
+    background: linear-gradient(to right, #2b71fb, #267DFA);
+}
+
+.desktop .menu-titile {
+    color: #333;
+}
+
+.desktop .main-container > .my-tabs > .tab-body > .el-tabs__header .el-tabs__item.is-active {
+    color: #fff;
+}
+
+.desktop .main-container > .my-tabs > .tab-body > .el-tabs__header .el-tabs__item:not(.is-disabled):hover {
+    color: #fff;
+}
+
+.desktop .el-tabs__item:not(.is-disabled):hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.desktop .el-tabs__item.is-active {
+    color: #2b71fb;
+}
+
+.desktop .top-tabs > .tab-body > .el-tabs__header .el-tabs__item.is-active {
+    color: #417ff9;
+    background: #fff;
+    font-weight: bold;
+    opacity: 100%;
+}
+
+.desktop .top-tabs > .tab-body > .el-tabs__header .el-tabs__item {
+    color: #fff;
+    padding: 0 15px !important;
+    border-radius: 6px 6px 0 0;
+    margin-top: 4px;
+    height: 44px;
+}
+
+.desktop .top-tabs > .tab-body > .el-tabs__header .el-tabs__active-bar {
+    background: #fff;
+}
+
+.desktop .el-tabs__active-bar {
+    background: #2b71fb;
+}
+
+.desktop .sub-portal .menu-app {
+    margin-top: 0;
+}
+
+.sub-portal .menu-app li .item-tab {
+    height: 100%;
+    float: left;
+    width: 40px;
+    padding: 10px 0;
+    position: absolute;
+    left: 0;
+    top: 0;
+    text-align: center;
+}
+
+.desktop .sub-portal .menu-app li > a {
+    color: #666;
+}
+
+.desktop .topbar-user {
+    background: #fff;
+}
+
+.desktop .topbar-user .topbar-user-info {
+    background: #2b71fb;
+}
+
+.desktop .topbar-right p {
+    color: #fff !important;
+}
+
+.desktop .sub-portal .menu-app li > a.submenu:before {
+    background: transparent;
+}
+
+.desktop .sub-portal .menu-app i.icon-tab {
+    text-align: center;
+}
+
+.desktop .sub-portal.sub-collapse .menu-app li > a:before {
+    width: 60px;
+}
+
+.desktop .sub-portal.sub-collapse .menu-app i.icon-tab {
+    left: 0;
+}
+
+.desktop .my-portal .sidebar {
+    background: #f5f5f5;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.16);
+}
+
+.desktop .my-portal a.navbar-brand {
+    background: #2b71fb;
+}
+
+.desktop .sub-portal .menu-app .submenu {
+    color: #666;
+}
+
+.desktop .sub-portal .ulex .submenu {
+    background: #fff;
+}
+
+.desktop .sidebar-nav-inner {
+    background: #fff;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.16);
+}
+
+.desktop .sidebar {
+    background: #fff;
+}
+
+.desktop .space-line {
+    opacity: 1;
+    background: #2b71fb;
+}
+
+.desktop .ulex a.submenu {
+    background: #fff;
+}
+
+.desktop .sidebar-inner {
+    background: #fff;
+}
+
+.desktop .top-profile .profile-organ {
+    color: #fff;
+}
+
+.desktop .top-profile .profile-user {
+    color: #fff;
+}
+
+.desktop .my-portal .nav.apps > li div.active {
+    border-bottom: 2px solid #fff !important;
+    color: #fff !important;
+}
+
+.desktop .my-portal .nav.apps > li div:hover {
+    color: #fff !important;
+}
+
+.desktop .my-portal .tools .message {
+    color: #fff;
+}
+
+.my-portal .tools .self-badge > i {
+    color: #fff;
+}
+
+.desktop .top-profile .icon-dropdown {
+    color: #fff;
+}
+
+.desktop .top-profile .message-center > p {
+    color: #fff;
+}
+
+.mdi-window .widget-header > span {
+    color: #2b71fb !important;
+}
+
+.mdi-window .widget-body button {
+    background-color: #2b71fb;
+    border-color: #2b71fb;
+}
+
+div.top-tabs > .tab-body > .el-tabs__header {
+    background: #2b71fb;
+}
+
+div.navbar-top .btn-bars {
+    color: #fff;
+}
+
+div.main-container > .my-tabs > .tab-body > .el-tabs__header .el-tabs__item {
+    color: #fff;
+}
+
+div.top-tabs > .tab-body > .el-tabs__header .icon-tab-head i {
+    background: transparent !important;
+}
+
+span.el-tabs__nav-next, .el-tabs__nav-prev {
+    color: #fff;
+}
+
+.my-tabs .el-tabs__item:not(.is-active) span.el-icon-close {
+    color: transparent;
+}
+
+.my-tabs .el-tabs__item:not(.is-active) .el-icon-close:hover {
+    color: #fff;
+}
+
+.desktop .top-tabs > .tab-body > .el-tabs__header .el-tabs__item > .el-icon-close {
+    margin-left: 4px;
+    margin-right: -4px;
+    border-radius: 50%;
+    opacity: 50%;
+    color: #fff;
+}
+
+.desktop .top-tabs > .tab-body > .el-tabs__header .el-tabs__item.is-active > .el-icon-close {
+    color: #666;
+}
+
+.desktop .top-tabs > .tab-body > .el-tabs__header .el-tabs__item:hover > .el-icon-close {
+    color: #fff;
+    opacity: 100%;
+}
+
+.desktop .top-tabs > .tab-body > .el-tabs__header .el-tabs__item.is-active:hover > .el-icon-close {
+    color: #666;
+}
+
+.desktop .top-tabs .tab-more > span {
+    color: #fff;
+    border-color: #fff;
+    background: none;
+}
+
+.desktop .top-tabs .tab-more > span:hover {
+    color: #fff;
+}
+
+.desktop .top-tabs .el-tabs__item:not(.is-active) .el-icon-close {
+    color: #fff;
+}
+
+.desktop .top-tabs .el-tabs__item .el-icon-close:hover {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+}
+
+.sidebar-inner::-webkit-scrollbar-track {
+    background: #fff !important;
+}
+
+.sidebar-inner::-webkit-scrollbar-thumb {
+    background: rgba(43, 60, 87, 0.4) !important;
+}
+
+.sidebar-nav-inner::-webkit-scrollbar-track {
+    background: #fff !important;
+}
+
+.sidebar-nav-inner::-webkit-scrollbar-thumb {
+    background: rgba(43, 60, 87, 0.4) !important;
+}
+
+.desktop .sub-portal .menu-app li.menu-active > a i.icon-tab {
+    color: #fff;
+}
+
+.desktop .sub-portal .menu-app li.menu-active > a {
+    color: #fff !important;
+    background: #417ff9 !important;
+}
+
+.desktop .sub-portal .menu-app li.menu-active li.menu-item-active > a {
+    color: #4088fe !important;
+}
+
+.desktop .sub-portal .menu-app li.menu-active > ul {
+    background: #f5f5f5;
+}
+
+.msgbox .title {
+    background: linear-gradient(to right, #2b71fb, #267DFA);
+}
+
+.msgbox .title > a {
+    color: #267DFA;
+}

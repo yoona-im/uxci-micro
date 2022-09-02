@@ -1,0 +1,20 @@
+{
+  "id": "app1",
+  "name": "示例应用",
+  "icon": "zmdi zmdi-storage",
+  "items": [
+    {
+      "id": "demo",
+      "name": "单文件Vue示例",
+      "icon": "zmdi zmdi-cloud-box bgm-gray",
+      "platform": 1023,
+      "url": "front/views/demo/testModule.js",
+      "properties": {
+        "moduleType": "iife",
+        "moduleName": "front.views.demo.testModule",
+        "loader": "vue2",
+        "particle": "module"
+      }
+    }
+  ]
+}

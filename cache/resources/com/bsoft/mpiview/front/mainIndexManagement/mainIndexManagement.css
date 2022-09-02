@@ -1,0 +1,86 @@
+.mainIndex-container .fl {
+    float: left;
+}
+.mainIndex-container .fr {
+    float: right;
+}
+.mainIndex-container .blue {
+    color: #4088FE;
+}
+.mainIndex-container .mt20 {
+    margin-top: 20px;
+}
+.mainIndex-container .hand {
+    cursor: pointer;
+}
+.mainIndex-container .search-row{
+    display: flex;
+}
+.mainIndex-container .search-row>div {
+    width: 20%;
+}
+.mainIndex-container .search-row .btns {
+    min-width: 215px;
+}
+.mainIndex-container {
+    padding: 20px;
+    height: 100%;
+    min-width: 1100px;
+}
+.mainIndex-container .search-table .operate-icon i{
+    color: #4088FE;
+    margin: 2px;
+}
+.mainIndex-container .search-table .operate-icon1 i{
+    font-size: 17px;
+    color: #4088FE;
+    margin: 2px;
+}
+body .drawer .el-drawer__body {
+    /* padding: 0 20px 20px !important; */
+    height: calc(100% - 48px);
+}
+/* body .drawer .el-drawer__header {
+    margin-bottom: 0px;
+    font-size: 18px !important;
+}
+body .drawer .el-drawer__title {
+    font-size: 18px !important;
+} */
+.track .el-drawer__body {
+    height: 100% !important;
+}
+.mainIndex-container .el-form-item__label {
+    font-weight: normal !important;
+    padding: 0;
+    color: #333;
+} 
+.mainIndex-container .mainIndex-table {
+    height: calc(100% - 82px);
+}
+.mainIndex-container .scroll-dialog .el-dialog__body {
+    height: 58vh;
+    padding-top: 10px;
+    overflow-y: scroll;
+    padding-bottom: 0;
+}
+.mainIndex-container .detail-dialog .el-dialog__body {
+    height: 68vh;
+}
+.mainIndex-container .el-form-item{
+    margin-bottom: 8px;
+}
+.mainIndex-container .action .cell {
+    margin-top: 1px;
+}
+.mainIndex-container .is-leaf .cell {
+    margin-top: 0px;
+}
+.mainIndex-container .el-loading-mask{
+    z-index: 200 !important;
+}
+/* @media screen and (min-width: 1680px) {
+    .mainIndex-container .search-row>div {
+      width: 16.66%;
+    }
+  } */

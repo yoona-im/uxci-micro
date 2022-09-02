@@ -1,0 +1,30 @@
+{
+  "ServerPort": 10087,
+  "watch": true,
+  "libRoot": "source/libs/",
+  "mockHome": "source/mock/",
+  "workflows": [
+    {
+      "dst": "web/"
+    },
+    {
+      "dst": "src/main/resource/"
+    },
+    {
+      "dst": "src/main/resource/com/bsoft/hihis/hrp/"
+    },
+    {
+      "src": "source/views/",
+      "dst": "src/main/resource/",
+      "tasks": ["iife", "copy"]
+    }
+  ],
+  "defines": {
+    "sfcCompiler": "source/libs/sfc/build.js"
+  },
+  "backend": {
+    "enable": true,
+    "url": "http://10.0.46.110:10087/hlmis/",
+    "cacheDir": "cache/"
+  }
+}

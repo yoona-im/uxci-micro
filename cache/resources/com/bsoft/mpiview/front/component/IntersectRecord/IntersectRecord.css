@@ -1,0 +1,57 @@
+.intersect-record .el-drawer__body {
+    padding: 0 20px 20px !important;
+}
+.intersect-record{
+    height: 100%;
+}
+.intersect-record .sub-title {
+    padding-left: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    position: relative;
+    font-size: 14px;
+}
+.intersect-record .sub-title::after {
+    display: block;
+    content: '';
+    width: 4px;
+    height: 18px;
+    background: #417FF9;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 0;
+}
+.intersect-record .search-row {
+    display: flex;
+    flex-wrap: wrap;
+}
+.intersect-record .fr {
+    float: right;
+}
+.intersect-record .search-row>div {
+    width: 20%;
+}
+.intersect-record .btns {
+    /* min-width: 224px; */
+    flex: 1;
+}
+.intersect-record .el-form-item__label {
+    font-weight: normal !important;
+}
+.intersect-record .table-wrap {
+    height: calc(100% - 286px);
+}
+.intersect-record .page {
+    float: right;
+    margin-top: 16px;
+}
+.intersect-record .el-form-item{
+    margin-bottom: 8px;
+}
+.intersect-record .el-loading-mask{
+    z-index: 200 !important;
+}
+.intersect-record .fl {
+    float: left;
+}

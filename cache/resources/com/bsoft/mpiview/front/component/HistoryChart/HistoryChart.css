@@ -1,0 +1,16 @@
+.history-chart{
+    height: 80%;
+}
+.history-chart .line{
+    width:  100%;
+    height: 100%;
+}
+.history-chart .no-data{
+    width:  100%;
+    height: 100%;
+    text-align: center;
+}
+.history-chart .no-data img {
+    width: 200px;
+    padding: 20px;
+}

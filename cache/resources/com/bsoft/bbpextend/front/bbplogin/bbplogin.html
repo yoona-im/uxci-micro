@@ -1,0 +1,112 @@
+<div class="bbplogin">
+    <el-row class="time-row" >
+        <div class="timeDiv">
+        <el-radio-group
+          class="search-radio-con"
+          v-model="invokeSearchTimeRadio"
+          @change="searchTimeRadioChange"
+        >
+          <el-radio label="1">今日</el-radio>
+          <!-- <el-radio label="2">昨日</el-radio> -->
+          <el-radio label="2">昨日</el-radio>
+          <el-radio label="3">一周</el-radio>
+          <el-radio label="4">自定义时间段</el-radio>
+        </el-radio-group>
+        <el-date-picker
+          :disabled="invokeSearchDatePickerDisabled"
+          @change="getdatPicker"
+          class="search-date-con"
+          v-model="invokeSearchDatePicker"
+          type="daterange"
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          value-format="yyyy-MM-dd"
+          size="mini"
+
+        ></el-date-picker>
+      </div>
+    </el-row>
+    <el-row class="first-row" :gutter="10">
+        <el-col :span="14">
+            <div  id="rectangle" ref="rectangleChartMoudle"></div>
+        </el-col>
+        <el-col :span="10">
+            <div v-if='platformData == []'>暂无数据</div>
+            <div v-else id="platform" ref="platformChartMoudle"></div>
+        </el-col>
+        <!-- <el-col :span="6">
+            <frame-div idname="callMontior" text="调用方统计"></frame-div>
+        </el-col> -->
+    </el-row>
+    <el-row class="sencond-row" :gutter="10">
+       <div style="height:100%">
+           <div class="loginHeader">
+               <div class="loginHeader-left">
+                <span>登录状态：</span>
+                <el-select v-model="value" placeholder="全部" @change="selectChangeHandle">
+                 <el-option
+                   class="loginStatus"
+                   v-for="item in options"
+                   :key="item.value"
+                   :label="item.label"
+                   :value="item.value">
+                 </el-option>
+               </div>
+                <div class="loginHeader-right">当前登录用户：{{userCount}}</div>
+              </el-select>
+           </div>
+           <div style="height: calc(100% - 95px);">
+
+            <el-table
+            height="100%"
+            :data="tableData"
+            style="width: 100%;height: 100%;">
+            <el-table-column
+              label="登录状态"
+              width="180">
+              <template slot-scope="scope">
+                <span v-if = "scope.row.state == 'login'" class="login">登录</span>
+                <span v-else class="logout">退出</span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="logDate"
+              label="记录时间"
+              width="180">
+            </el-table-column>
+            <el-table-column
+              prop="ip"
+              label="IP地址">
+            </el-table-column>
+            <el-table-column
+              prop="user"
+              label="用户编码">
+            </el-table-column>
+            <el-table-column
+              prop="userName"
+              label="用户名">
+            </el-table-column>
+            <el-table-column
+              prop="domainName"
+              label="所属域">
+            </el-table-column>
+            </el-table> 
+
+           </div>
+           <div class="pagetion">
+            <el-pagination
+                  class="page"
+                  @current-change="pageChange"
+                  :current-page="pageIndex"
+                  :page-size="pageSize"
+                  layout="total, prev, pager, next, jumper"
+                  :total="pageCount"
+                >
+            </el-pagination>
+        </div>
+       </div>
+       
+    </el-row>
+    
+</div>

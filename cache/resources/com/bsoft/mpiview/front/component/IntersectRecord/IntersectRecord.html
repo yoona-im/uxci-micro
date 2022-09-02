@@ -1,0 +1,123 @@
+<div class="intersect-record mpi-container">
+    <p class="sub-title">主索引信息</p>
+    <el-table :data="mainIndexList" tooltip-effect="dark" size="small" :header-cell-style="headClass"  :cell-style="{color: '#333', fontSize: '14px'}">
+        <el-table-column prop="mpiId" label="MPIID" show-overflow-tooltip min-width="150">
+        </el-table-column>
+        <el-table-column prop="healthInsuranceCardId" label="社保卡号" show-overflow-tooltip>
+        </el-table-column>
+        <el-table-column prop="healthCardId" label="健康卡号" show-overflow-tooltip>
+        </el-table-column>
+        <el-table-column prop="name" label="患者姓名" width="100">
+        </el-table-column>
+        <el-table-column prop="idCard" label="身份证号" show-overflow-tooltip>
+        </el-table-column>
+        <el-table-column prop="sexName" label="性别" width="50">
+            <template slot-scope="scope">
+                <span>{{scope.row.sexName || scope.row.sex }}</span>
+            </template>
+        </el-table-column>
+        <el-table-column prop="birthDate" label="出生日期" min-width="90">
+            <template slot-scope="scope">
+                <span>{{scope.row.birthDate && scope.row.birthDate.slice(0, 10)}}</span>
+            </template>
+        </el-table-column>
+        <el-table-column prop="patientPhone" label="联系电话" width="100" show-overflow-tooltip>
+        </el-table-column>
+    </el-table>
+    <p class="sub-title">交叉索引记录</p>
+    <div class="search-form">
+        <el-form :model="searchForm" ref="searchForm" label-width="82px" size="mini">
+            <div class="search-row">
+                <div>
+                    <el-form-item label="建档机构：" prop="orgCode">
+                        <el-select v-model="searchForm.orgCode" placeholder="请选择建档机构" style="width: 100%;" clearable>
+                            <el-option
+                              v-for="(item, index) in orgs"
+                              :key="item.authorOrganization + index"
+                              :label="item.authorOrganizationName"
+                              :value="item.authorOrganization">
+                            </el-option>
+                          </el-select>
+                    </el-form-item>
+                </div>
+                <div>
+                    <el-form-item label="业务系统：" prop="businessSystemCode">
+                        <el-select v-model="searchForm.businessSystemCode" placeholder="请选择业务系统" style="width: 100%;" clearable>
+                            <el-option
+                              v-for="item in systems"
+                              :key="item"
+                              :label="item"
+                              :value="item">
+                            </el-option>
+                          </el-select>
+                    </el-form-item>
+                </div>
+                <div>
+                    <el-form-item label="患者姓名：" prop="name">
+                        <el-input v-model="searchForm.name" placeholder="请输入患者姓名" :maxlength="30"></el-input>
+                    </el-form-item>
+                </div>
+                <div>
+                    <el-form-item label="身份证号：" prop="idCard">
+                        <el-input v-model="searchForm.idCard" placeholder="请输入身份证号" :maxlength="20"></el-input>
+                    </el-form-item>
+                </div>
+                <div>
+                    <el-form-item label="联系电话：" prop="patientPhone">
+                        <el-input v-model="searchForm.patientPhone" placeholder="请输入联系电话" :maxlength="15"></el-input>
+                    </el-form-item>
+                </div>
+                <div>
+                    <el-form-item label="社保卡号：" prop="cardId">
+                        <el-input v-model="searchForm.cardId" placeholder="请输入社保卡号" :maxlength="20"></el-input>
+                    </el-form-item>
+                </div>
+                <div class="btns">
+                    <el-form-item label-width="20px">
+                        <el-button @click="resetForm" class="fl">重置</el-button>
+                        <el-button type="primary" @click="formSearch" class="fl">查询</el-button>
+                        <el-button type="primary" @click="handleSplit" class="fr" :disabled="!sourcePatientId">拆分
+                        </el-button>
+                    </el-form-item>
+                </div>
+            </div>
+        </el-form>
+    </div>
+        <div class="table-wrap">
+            <el-table :data="intersectTableData" tooltip-effect="dark" size="small" :header-cell-style="headClass" highlight-current-row @current-change="intersectTableChange" height="100%" v-loading="tableLoading"
+            element-loading-text="加载中"
+            element-loading-spinner="el-icon-loading"
+            element-loading-background="hsla(0,0%,100%,.9)" :cell-style="{color: '#333', fontSize: '14px'}">
+                <el-table-column prop="orgName" label="机构 " show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="businessSystemCode" label="系统" show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="visitType" label="就诊类型" show-overflow-tooltip>
+                    <template slot-scope="scope">
+                        <span>{{visitTypeEnums[scope.row.visitType] || ''}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="businessId" label="业务ID ">
+                </el-table-column>
+                <el-table-column prop="healthInsuranceCardId" label="社保卡号">
+                </el-table-column>
+                <el-table-column prop="name" label="患者姓名" width="100">
+                </el-table-column>
+                <el-table-column prop="sexName" label="性别" width="50" show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="idCard" label="身份证号" show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="birthDate" label="出生日期" min-width="90">
+                    <template slot-scope="scope">
+                        <span>{{scope.row.birthDate && scope.row.birthDate.slice(0, 10)}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="patientPhone" label="联系电话" width="100" show-overflow-tooltip>
+                </el-table-column>
+            </el-table>
+        </div>
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageNo"
+        :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
+    </el-pagination>
+    
+</div>

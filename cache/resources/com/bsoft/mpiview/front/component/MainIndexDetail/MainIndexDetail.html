@@ -1,0 +1,347 @@
+<div class="main-index-detail">
+    <el-form :model="detailForm" label-width="180px" size="small" class="form-detail">
+        <el-row>
+            <el-col span="8">
+                <el-form-item label="患者姓名">
+                    <span>{{detailForm.name}}</span>
+                </el-form-item>
+            </el-col>
+            <el-col span="8">
+                <el-form-item label="MPIID">
+                    <el-tooltip effect="dark" :content="detailForm.mpiId" placement="bottom" v-if="detailForm.mpiId">
+                        <span>{{detailForm.mpiId}}</span>
+                    </el-tooltip>
+
+                </el-form-item>
+            </el-col>
+            <el-col span="8">
+                <el-form-item label="联系电话">
+                    <span>{{detailForm.patientPhone}}</span>
+                </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row>
+            <el-col span="8">
+                <el-form-item label="性别">
+                    <span>{{detailForm.sexName || detailForm.sex}}</span>
+                </el-form-item>
+            </el-col>
+            <el-col span="8">
+                <el-form-item label="身份证号">
+                    <el-tooltip effect="dark" :content="detailForm.idCard" placement="bottom" v-if="detailForm.idCard">
+                    </el-tooltip>
+                    <span>{{detailForm.idCard}}</span>
+                    </el-tooltip>
+
+                </el-form-item>
+            </el-col>
+            <el-col span="8">
+                <el-form-item label="护照">
+                    <span>{{detailForm.passPort}}</span>
+                </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row>
+            <el-col span="8">
+                <el-form-item label="出生日期">
+                    <span>{{detailForm.birthDate && detailForm.birthDate.slice(0, 10)}}</span>
+                </el-form-item>
+            </el-col>
+            <el-col span="8">
+                <el-form-item label="社保卡号">
+                    <span>{{detailForm.healthInsuranceCardId}}</span>
+                </el-form-item>
+            </el-col>
+            <el-col span="8">
+                <el-form-item label="军官证">
+                    <span>{{detailForm.militaryId}}</span>
+                </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row>
+            <el-col span="8">
+                <el-form-item label="国籍">
+                    <span>{{detailForm.nationalityName || detailForm.nationality}}</span>
+                </el-form-item>
+            </el-col>
+            <el-col span="8">
+                <el-form-item label="健康卡号">
+                    <el-tooltip effect="dark" :content="detailForm.healthCardId" placement="bottom"
+                        v-if="detailForm.healthCardId">
+                        <span>{{detailForm.healthCardId}}</span>
+                    </el-tooltip>
+                </el-form-item>
+            </el-col>
+            <el-col span="8">
+                <el-form-item label="民族">
+                    <span>{{detailForm.ethnicGroupName || detailForm.ethnicGroup}}</span>
+                </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row>
+            <el-col span="8">
+                <el-form-item label="市民卡号">
+                    <span>{{detailForm.citizenCard}}</span>
+                </el-form-item>
+            </el-col>
+            <el-col span="8">
+                <el-form-item label="港澳居民往来内地通行证">
+                    <el-tooltip effect="dark" :content="detailForm.hongKongAndMaCaoTravelPermit" placement="bottom"
+                        v-if="detailForm.hongKongAndMaCaoTravelPermit">
+                        <span>{{detailForm.hongKongAndMaCaoTravelPermit}}</span>
+                    </el-tooltip>
+                </el-form-item>
+            </el-col>
+            <el-col span="8">
+                <el-form-item label="婚姻状况">
+                    <span>{{detailForm.maritalStatusName || detailForm.maritalStatus}}</span>
+                </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row>
+            <el-col span="8">
+                <el-form-item label="自费卡号">
+                    <el-tooltip effect="dark" :content="detailForm.selfExpenseCard" placement="bottom"
+                        v-if="detailForm.selfExpenseCard">
+                        <span>{{detailForm.selfExpenseCard}}</span>
+                    </el-tooltip>
+                </el-form-item>
+            </el-col>
+            <el-col span="8">
+                <el-form-item label="血型">
+                    <span>{{detailForm.bloodCodeName || detailForm.bloodCode}}</span>
+                </el-form-item>
+            </el-col>
+            <el-col span="8">
+                <el-form-item label="银联卡号">
+                    <span>{{detailForm.unionPayCard}}</span>
+                </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row>
+            <el-col span="8">
+                <el-form-item label="台湾居民往来内地通行证 ">
+                    <el-tooltip effect="dark" :content="detailForm.taiWanTravelPermit" placement="bottom"
+                        v-if="detailForm.taiWanTravelPermit">
+                        <span>{{detailForm.taiWanTravelPermit}}</span>
+                    </el-tooltip>
+                </el-form-item>
+            </el-col>
+            <el-col span="8">
+                <el-form-item label="RH血型">
+                    <span>{{detailForm.rhBloodCodeName || detailForm.rhBloodCode}}</span>
+                </el-form-item>
+            </el-col>
+            <el-col span="8">
+                <el-form-item label="健康档案编号">
+                    <el-tooltip effect="dark" :content="detailForm.healthRecordId" placement="bottom"
+                        v-if="detailForm.healthRecordId">
+                        <span>{{detailForm.healthRecordId}}</span>
+                    </el-tooltip>
+                </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row>
+            <el-col span="8">
+                <el-form-item label="文化程度">
+                    <span>{{detailForm.educationCodeName || detailForm.educationCode}}</span>
+                </el-form-item>
+            </el-col>
+            <el-col span="8">
+                <el-form-item label="医保类型">
+                    <span>{{detailForm.medicalInsuranceCategoryCodeName || detailForm.medicalInsuranceCategoryCode}}</span>
+                </el-form-item>
+            </el-col>
+            <el-col span="8">
+                <el-form-item label="最后修改时间">
+                    <span>{{detailForm.lastModifyTime}}</span>
+                </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row>
+            <el-col span="8">
+                <el-form-item label="职业类别 ">
+                    <span>{{detailForm.occupationCategoryCodeName || detailForm.occupationCategoryCode}}</span>
+                </el-form-item>
+            </el-col>
+        </el-row>
+    </el-form>
+    <el-tabs type="card" class="mt20" v-model="activeName" class="card-tabs">
+        <el-tab-pane label="卡信息" name="name1">
+            <el-table :data="cardTableData" tooltip-effect="dark" size="small" :header-cell-style="headClass"
+                max-height="400" :cell-style="{color: '#333', fontSize: '14px'}">
+                <el-table-column prop="orgName" label="机构 " show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="systemCode" label="系统" show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="visitType" label="就诊类型" show-overflow-tooltip>
+                    <template slot-scope="scope">
+                        <span>{{visitTypeEnums[scope.row.visitType] || ''}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="businessId" label="业务ID" show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="cardTypeCodeName" label="卡类型" show-overflow-tooltip>
+                    <template slot-scope="scope">
+                        <span>{{scope.row.cardTypeCodeName || scope.row.cardTypeCode}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="cardNo" label="卡号" show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="statusName" label="状态" show-overflow-tooltip>
+                    <template slot-scope="scope">
+                        <span>{{scope.row.statusName || scope.row.status}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="validTime" label="有效期">
+                </el-table-column>
+                <el-table-column prop="lastModifyTime" label="最后修改时间" show-overflow-tooltip min-width="100">
+                </el-table-column>
+                <el-table-column prop="astModifyUser" label="最后修改人" show-overflow-tooltip>
+                </el-table-column>
+            </el-table>
+        </el-tab-pane>
+        <el-tab-pane label="证件" name="name2">
+            <el-table :data="certTableData" tooltip-effect="dark" size="small" :header-cell-style="headClass"
+                max-height="400" :cell-style="{color: '#333', fontSize: '14px'}">
+                <el-table-column prop="orgName" label="机构" show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="systemCode" label="系统" show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="visitType" label="就诊类型" show-overflow-tooltip>
+                    <template slot-scope="scope">
+                        <span>{{visitTypeEnums[scope.row.visitType] || ''}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="businessId" label="业务ID" show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="certificateTypeCodeName" label="证件类型" show-overflow-tooltip>
+                    <template slot-scope="scope">
+                        <span>{{scope.row.certificateTypeCodeName || scope.row.certificateTypeCode}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="certificateNo" label="证件号码" show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="lastModifyTime" label="最后修改时间" show-overflow-tooltip min-width="100">
+                </el-table-column>
+                <el-table-column prop="astModifyUser" label="最后修改人" show-overflow-tooltip>
+                </el-table-column>
+            </el-table>
+        </el-tab-pane>
+        <el-tab-pane label="地址" name="name3">
+            <el-table :data="addrTableData" tooltip-effect="dark" size="small" :header-cell-style="headClass"
+                max-height="400" :cell-style="{color: '#333', fontSize: '14px'}">
+                <el-table-column prop="orgName" label="机构 " show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="systemCode" label="系统" show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="visitType" label="就诊类型" show-overflow-tooltip>
+                    <template slot-scope="scope">
+                        <span>{{visitTypeEnums[scope.row.visitType] || ''}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="businessId" label="业务ID" show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="addrTypeCodeName" label="地址类型" show-overflow-tooltip>
+                    <template slot-scope="scope">
+                        <span>{{scope.row.addrTypeCodeName || scope.row.addrTypeCode}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="address" label="地址" show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="postCode" label="邮编" show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="lastModifyTime" label="最后修改时间" show-overflow-tooltip min-width="100">
+                </el-table-column>
+                <el-table-column prop="astModifyUser" label="最后修改人" show-overflow-tooltip>
+                </el-table-column>
+            </el-table>
+        </el-tab-pane>
+        <el-tab-pane label="其他联系方式" name="name4">
+            <el-table :data="otherontactTableData" tooltip-effect="dark" size="small" :header-cell-style="headClass"
+                max-height="400" :cell-style="{color: '#333', fontSize: '14px'}">
+                <el-table-column prop="orgName" label="机构 " show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="systemCode" label="系统" show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="visitType" label="就诊类型" show-overflow-tooltip>
+                    <template slot-scope="scope">
+                        <span>{{visitTypeEnums[scope.row.visitType] || ''}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="businessId" label="业务ID" show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="contactTypeCodeName" label="联系类型" show-overflow-tooltip>
+                    <template slot-scope="scope">
+                        <span>{{scope.row.contactTypeCodeName || scope.row.contactTypeCode}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="contactNo" label="联系号码" show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="lastModifyTime" label="最后修改时间" show-overflow-tooltip min-width="100">
+                </el-table-column>
+                <el-table-column prop="astModifyUser" label="最后修改人" show-overflow-tooltip>
+                </el-table-column>
+            </el-table>
+        </el-tab-pane>
+        <el-tab-pane label="联系人" name="name5">
+            <el-table :data="contactTableData" tooltip-effect="dark" size="small" :header-cell-style="headClass"
+                max-height="400" :cell-style="{color: '#333', fontSize: '14px'}">
+                <el-table-column prop="orgName" label="机构 " show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="systemCode" label="系统" show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="visitType" label="就诊类型" show-overflow-tooltip>
+                    <template slot-scope="scope">
+                        <span>{{visitTypeEnums[scope.row.visitType] || ''}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="businessId" label="业务ID" show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="contactCardName" label="证件类型" show-overflow-tooltip>
+                    <template slot-scope="scope">
+                        <span>{{scope.row.contactCardName || scope.row.contactCard}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="contactCard" label="证件号码" show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="contactPerson" label="联系人姓名" show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="contactPersonTel" label="联系人电话" show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="lastModifyTime" label="最后修改时间" show-overflow-tooltip min-width="100">
+                </el-table-column>
+                <el-table-column prop="astModifyUser" label="最后修改人" show-overflow-tooltip>
+                </el-table-column>
+            </el-table>
+        </el-tab-pane>
+        <el-tab-pane label="系统信息" name="name6">
+            <el-table :data="systemTableData" tooltip-effect="dark" size="small" :header-cell-style="headClass"
+                max-height="400" :cell-style="{color: '#333', fontSize: '14px'}">
+                <el-table-column prop="authorOrganizationName" label="机构 " show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="businessSystemCode" label="系统" show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="sourcePatientIdTypeName" label="就诊类型" show-overflow-tooltip>
+                    <!-- <template slot-scope="scope">
+                        <span>{{visitTypeEnums[scope.row.sourcePatientIdType] || ''}}</span>
+                    </template> -->
+                </el-table-column>
+                <el-table-column prop="sourcePatientId" label="业务ID" show-overflow-tooltip>
+                </el-table-column>
+                <!-- <el-table-column prop="authorOrganization" label="建档机构" show-overflow-tooltip>
+                    <template slot-scope="scope">
+                        <span>{{scope.row.authorOrganizationName || scope.row.authorOrganization}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="sourcePatientIdTypeName" label="档案类型" show-overflow-tooltip>
+                    <template slot-scope="scope">
+                        <span>{{scope.row.sourcePatientIdTypeName || scope.row.sourcePatientIdType}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="sourcePatientId" label="档案ID" show-overflow-tooltip>
+                </el-table-column> -->
+            </el-table>
+        </el-tab-pane>
+    </el-tabs>
+</div>

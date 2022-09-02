@@ -1,0 +1,44 @@
+.sex-dic-management {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: #fff;
+}
+
+.sex-dic-management .search-con {
+    width: 100%;
+    height: 50px;
+    line-height: 50px;
+    padding: 0 10px 0 10px;
+}
+
+.sex-dic-management .table-con {
+    width: 100%;
+    height: calc(100% - 50px);
+    padding: 10px;
+}
+
+.dic-delete-confirm .el-message-box__status.el-icon-warning {
+    color: #fc5154;
+}
+
+.dic-delete-confirm .el-button {
+    float: right;
+    margin-right: 10px;
+}
+
+.import-dic-dialog input[type=file] {
+    display: none;
+}
+
+.import-dic-dialog .el-upload__tip {
+    color: #fc5154;
+}
+
+.import-dic-dialog .import-dic-org-form-item .el-select {
+    width: 100%;
+}
+
+.import-dic-dialog .import-dic-status-form-item .el-radio__label {
+    font-size: 12px;
+}

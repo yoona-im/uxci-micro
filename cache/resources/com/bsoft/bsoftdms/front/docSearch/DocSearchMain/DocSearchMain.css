@@ -1,0 +1,32 @@
+#conditionDiv:last-child {
+    margin-bottom: 0;
+}
+
+.cardMargin {
+    margin-left: 1%;
+    margin-right: 1%;
+    margin-top: 10px;
+    cursor: pointer;
+    width: 220px;
+    float: left;
+    display: inline;
+}
+
+.cardMargin:hover {
+    -webkit-box-shadow: 0 2px 12px 0 rgba(0, 0, 0, .1) !important;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, .1) !important;
+}
+
+.cardMarginCheck {
+    -webkit-box-shadow: 0 2px 12px 0 rgba(0, 0, 0, .1) !important;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, .1) !important;
+}
+
+.dataSetSelect .el-select__tags-text {
+    display: block;
+    max-width: 100px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    float: left;
+}

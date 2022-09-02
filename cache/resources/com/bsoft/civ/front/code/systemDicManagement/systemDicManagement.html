@@ -1,0 +1,18 @@
+<!-- 系统字典管理 -->
+<div class="system-dic-management">
+    <!-- left-nav-con -->
+    <div class="left-nav-con">
+        <el-menu :default-active="activeNavIndex" class="left-nav" @select="navSelect">
+            <el-menu-item v-for="(item, index) in navData" :key="index" :index="index + ''">
+                <span slot="title">{{item}}</span>
+            </el-menu-item>
+        </el-menu>
+    </div>
+    <!-- right-content-con -->
+    <div class="right-content-con">
+        <org-dept-dic-management v-if="orgDeptDicManagementShow" @toSystemVarConfig="toSystemVarConfig"></org-dept-dic-management>
+        <sex-dic-management v-if="sexDicManagementShow"></sex-dic-management>
+        <disease-dic-management v-if="diseaseDicManagementShow"></disease-dic-management>
+        <disease-type-dic-management v-if="diseaseTypeDicManagementShow"></disease-type-dic-management>
+    </div>
+</div>

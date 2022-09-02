@@ -1,0 +1,111 @@
+<div class="sex-dic-management">
+    <!-- search-con -->
+    <div class="search-con">
+        <span class="search-label">机构 : </span>
+        <el-select v-model="searchOrgCode" size="mini" filterable clearable>
+            <el-option v-for="(item, index) in searchOrgCodeSelect" :key="index" :label="item.organizationName"
+                :value="item.organizationCode">
+            </el-option>
+        </el-select>
+        <el-input class="search-input" placeholder="请输入编码或者名称检索" v-model="searchText" size="mini" clearable
+            style="width: 200px;" @keydown.enter.native="searchDic">
+            <i slot="suffix" class="iconfont civ-ico_opt_search" style="cursor: pointer;" @click="searchDic"></i>
+        </el-input>
+        <el-button @click="searchDic" type="primary" size="mini" style="margin-left: 20px;">查询</el-button>
+        <el-button @click="addDic" type="primary" size="mini" style="float: right; margin-top: 10px;">新增</el-button>
+        <el-button @click="importDic" size="mini" style="float: right; margin-top: 10px;">导入</el-button>
+    </div>
+    <!-- table-con -->
+    <div class="table-con">
+        <el-table v-loading="sexDicTableLoading" class="sex-dic-table" border :data="sexDicTableData" ref="sexDicTable"
+            header-cell-style="background-color: #ebf4ff; color: #333;" height="calc(100% - 60px)"
+            @row-dblclick="sexDicTableDblClick">
+            <el-table-column type="index" label="序号" width="70" align="center"></el-table-column>
+            <el-table-column prop="organization" label="机构" width="180" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{formatOrganization(scope.row.organization)}}</span>
+                </template>
+            </el-table-column>
+            <el-table-column prop="sexCode" label="编码">
+            </el-table-column>
+            <el-table-column prop="sexName" label="名称">
+            </el-table-column>
+            <el-table-column width="80" label="操作" align="center">
+                <template slot-scope="scope">
+                    <el-tooltip class="item" effect="dark" content="修改" :enterable='false' placement="top">
+                        <span class="iconfont civ-ico_opt_edit01"
+                            style="color: #0480ff; cursor: pointer; font-size: 14px; margin-right: 10px;"
+                            @click='updateSexDic(scope.row)'></span>
+                    </el-tooltip>
+                    <el-tooltip class="item" effect="dark" content="删除" :enterable='false' placement="top">
+                        <span class="iconfont civ-ico_operate_delete" style="color: #0480ff; cursor: pointer;"
+                            @click='delSexDic(scope.row)'></span>
+                    </el-tooltip>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination @size-change="sexDicTableSizeChange" @current-change="sexDicTableCurrentChange" :pager-count="5"
+            :page-sizes="[10, 20, 30, 50]" :page-size="sexDicTableSearchPageSize"
+            layout="total, sizes, prev, pager, next, jumper" style="margin-top: 20px; float: right"
+            :total="sexDicTableDataTotal" :current-page="sexDicTableSearchPageNum">
+        </el-pagination>
+    </div>
+    <!-- add-update-sex-dialog -->
+    <el-dialog class="add-update-sex-dialog" :title="addUpdateSexDialogTitle" :visible.sync="addUpdateSexDialogVisible"
+        width="500px" :modal-append-to-body="false" :close-on-click-modal="false" @close="addUpdateSexDialogClose">
+        <div class="content">
+            <el-form :model="addUpdateSexFormData" class="add-update-sex-form" :rules="addUpdateSexFormRules"
+                ref="addUpdateSexForm">
+                <el-form-item class="add-update-sex-code-form-item" label-width="80px" label="编码 : " prop="sexCode">
+                    <el-input class="dic-item-code-input" placeholder="请输入编码" v-model.trim="addUpdateSexFormData.sexCode"
+                        size="mini" maxlength="20" clearable :disabled="dicItemCodeInputDisabled">
+                    </el-input>
+                </el-form-item>
+                <el-form-item class="add-update-sex-name-form-item" label-width="80px" label="名称 : " prop="sexName">
+                    <el-input class="dic-item-name-input" placeholder="请输入名称" v-model.trim="addUpdateSexFormData.sexName"
+                        size="mini" maxlength="20" clearable>
+                    </el-input>
+                </el-form-item>
+            </el-form>
+        </div>
+        <div slot="footer">
+            <el-button type="primary" @click="addUpdateSex" size="small">确 认</el-button>
+            <el-button @click="addUpdateSexDialogVisible = false" size="small">取 消</el-button>
+        </div>
+    </el-dialog>
+    <!-- import-dic-dialog -->
+    <el-dialog class="import-dic-dialog" title="导入" :visible.sync="importDicDialogVisible" width="500px"
+        :modal-append-to-body="false" :close-on-click-modal="false" @close="importDicDialogClose">
+        <div class="content">
+            <el-form :model="importDicFormData" class="import-dic-form" :rules="importDicFormRules" ref="importDicForm">
+                <el-form-item class="import-dic-org-form-item" label-width="100px" label="机构 : " prop="orgCode">
+                    <el-select v-model="importDicFormData.orgCode" size="mini" filterable>
+                        <el-option v-for="(item, index) in importDicOrgCodeSelect" :key="index"
+                            :label="item.organizationName" :value="item.organizationCode">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item class="import-dic-file-form-item" label-width="100px" label="性别文档 : " prop="fileList">
+                    <el-upload ref="importDicFileUpload" class="import-dic-file-upload" :http-request="realImportDic"
+                        accept=".xls" :limit="1" :on-change="handleChange" :auto-upload="false"
+                        :file-list="importDicFormData.fileList">
+                        <el-button size="mini" type="primary">点击上传</el-button>
+                        <el-button size="mini" type="text" @click.stop="downloadExcel" :loading="downloadExcelLoading">
+                            下载模版</el-button>
+                        <div slot="tip" class="el-upload__tip">只允许上传一份 excel 格式的文件</div>
+                    </el-upload>
+                </el-form-item>
+                <el-form-item class="import-dic-status-form-item" label-width="100px" label="导入类型 : " prop="status">
+                    <el-radio-group v-model="importDicFormData.status">
+                        <el-radio :label="1">清空导入</el-radio>
+                        <el-radio :label="0">覆盖导入</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+            </el-form>
+        </div>
+        <div slot="footer">
+            <el-button type="primary" @click="confirmImportDic" size="small">确 认</el-button>
+            <el-button @click="importDicDialogVisible = false" size="small">取 消</el-button>
+        </div>
+    </el-dialog>
+</div>

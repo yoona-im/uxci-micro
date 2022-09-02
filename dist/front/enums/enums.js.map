@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../src/front/enums/enums.m.js"],"sourcesContent":["export const statusEnum = {\r\n    TEST: {\r\n        code: '0',\r\n        name: '正式'\r\n    },\r\n    FORMAL: {\r\n        code: '1',\r\n        name: '测试'\r\n    }\r\n};"],"mappings":"iiBAAAA,iCAAO,GAAM,GAAa,CACtB,KAAM,CACF,KAAM,IACN,KAAM,IACV,EACA,OAAQ,CACJ,KAAM,IACN,KAAM,IACV,CACJ;","names":[]}

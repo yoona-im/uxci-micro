@@ -1,0 +1,31 @@
+<div>
+    <el-alert title="合并主索引后，会解除与以上主索引的疑似关系，并重新匹配合并后的主索引与所有主索引的关系，是否确定合并？" type="warning" :closable="false">
+    </el-alert>
+    <div v-for="item in suspectedList" class="mt20">
+        <p>与<span class="blue">{{item.name}}({{item.mpiId}})</span>存在疑似关系的主索引如下:</p>
+        <el-table :data="item.list" tooltip-effect="dark" size="small" :header-cell-style="headClass" :cell-style="{color: '#333', fontSize: '14px'}">
+            <el-table-column prop="mpiId" label="MPIID" show-overflow-tooltip>
+            </el-table-column>
+            <el-table-column prop="healthInsuranceCardId" label="社保卡号" show-overflow-tooltip>
+            </el-table-column>
+            <el-table-column prop="healthCardId" label="健康卡号" show-overflow-tooltip>
+            </el-table-column>
+            <el-table-column prop="name" label="患者姓名" width="100">
+            </el-table-column>
+            <el-table-column prop="idCard" label="身份证号" show-overflow-tooltip>
+            </el-table-column>
+            <el-table-column prop="sexName" label="性别" width="50">
+                <template slot-scope="scope">
+                    <span>{{scope.row.sexName || scope.row.sex }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column prop="birthDate" label="出生日期" width="90">
+                <template slot-scope="scope">
+                    <span>{{scope.row.birthDate && scope.row.birthDate.slice(0, 10)}}</span>
+                </template>
+            </el-table-column>
+            <el-table-column prop="patientPhone" label="联系电话" width="100">
+            </el-table-column>
+        </el-table>
+    </div>
+</div>

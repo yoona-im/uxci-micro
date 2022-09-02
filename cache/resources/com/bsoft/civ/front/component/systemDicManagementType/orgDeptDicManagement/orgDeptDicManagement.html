@@ -1,0 +1,42 @@
+<div class="org-dept-dic-management" v-loading="getOrgDeptLoading">
+    <div class="org-dept-sync-btn-con">
+        <el-button @click="syncOrgDept()" type="primary" size="mini" style="margin-left: 20px;"
+            :loading="syncOrgDeptLoading">同步</el-button>
+    </div>
+    <div class="has-data-con" v-if="hasDataShow">
+        <div class="org-dept">
+            <div class="org-dept-tree-box" v-for="(orgDeptData, index) in orgDeptsData" :key="index">
+                <div class="org-title-con">
+                    <span>{{orgDeptData.name}}</span>
+                    <el-tooltip content="同步" placement="top">
+                        <el-button size="mini" type="text"
+                            :class="'iconfont civ-ico_opt_refresh_solid ' + (syncOrgDeptAnimate == true ? 'rotation' : '')"
+                            @click="syncOrgDept(orgDeptData.code)" style="cursor: pointer;"></el-button>
+                    </el-tooltip>
+                </div>
+                <div class="org-dept-tree-con">
+                    <el-scrollbar style="height: 100%;">
+                        <el-tree :data="orgDeptData.children" node-key="code" ref="orgDeptTree"
+                            :props="orgDeptTreeProps" default-expand-all empty-text="暂无下层机构科室数据">
+                            <div class="custom-tree-node" slot-scope="{ node, data }" :id="'orgDeptTree' + data.code">
+                                <i class="folder-icon iconfont civ-icon_jg" style="color: #fcca1b; font-size: 14px;"
+                                    v-if="data.type == 'org'"></i>
+                                <i class="folder-icon iconfont civ-icon_ks" style="color: #fcca1b; font-size: 14px;"
+                                    v-if="data.type == 'dept'"></i>
+                                <span>{{data.name}}</span>
+                            </div>
+                        </el-tree>
+                    </el-scrollbar>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="null-data-con" v-if="!hasDataShow">
+        <div class="tooltip-con">
+            <img src="resources/com/bsoft/civ/front/images/img_no_data.png" style="margin-left: 44px;" />
+            <div style="height: 70px; line-height: 70px; color: #999;">暂无数据，首次需要在系统参数配置页面进行同步</div>
+            <el-button @click="toSystemVarConfig" type="primary" size="mini" style="margin-left: 60px;">转到系统参数配置页同步
+            </el-button>
+        </div>
+    </div>
+</div>

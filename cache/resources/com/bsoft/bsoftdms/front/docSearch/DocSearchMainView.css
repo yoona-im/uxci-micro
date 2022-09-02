@@ -1,0 +1,105 @@
+.docSearch-main-view {
+    margin: 10px !important;
+    background-color: #fff;
+}
+
+#conditionDiv:last-child {
+    margin-bottom: 0;
+}
+
+.el-row {
+    margin-top: 0px;
+}
+
+.el-col {
+    border-radius: 4px;
+}
+
+.bg-purple-dark {
+    background: #99a9bf;
+}
+
+.bg-purple {
+    background: #d3dce6;
+}
+
+.bg-purple-light {
+    background: #e5e9f2;
+}
+
+.grid-content {
+    border-radius: 4px;
+    min-height: 36px;
+}
+
+.row-bg {
+    padding: 10px 0;
+    background-color: #f9fafc;
+}
+
+.el-col-6 {
+    line-height: 36px;
+}
+
+.searchShow {
+    position: absolute;
+    left: 50%;
+    margin-left: -73px;
+    border-radius: 10%;
+    cursor: pointer;
+    z-index: 999;
+    margin-top: -1px;
+}
+
+.searchShowicon {
+    position: absolute;
+    top: 0px;
+    left: 50px;
+    font-size: 10px;
+    color: rgb(13, 153, 228);
+    transform: scale(0.5);
+}
+
+.bottomInit {
+    position: absolute;
+    bottom: 10px;
+    top: 102px;
+    left: 10px;
+    right: 10px;
+}
+
+.choosePatientDiv {
+    position: absolute;
+    z-index: 100;
+    width: 100%;
+    bottom: 0px;
+    top: 64px;
+}
+
+.maskLayer {
+    opacity: 0.5;
+    z-index: 99;
+    background-color: #000;
+}
+
+.displayNone {
+    display: none;
+}
+
+.starColorYellow {
+    color: #FF6427;
+}
+
+.starColorGray {
+    color: #D9D9D9;
+}
+
+.defaultImage {
+    width: 300px;
+    height: 240px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -120px;
+    margin-left: -150px;
+}

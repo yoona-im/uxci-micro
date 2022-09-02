@@ -1,0 +1,124 @@
+/* 
+按钮：主要按钮颜色：#0480FF; 次要按钮填充色：#fff；按钮间距8px(具体页面可能要加样式调整)；
+表单：lebel颜色：#333；label与输入框间距：0px；输入框左右padding：10px；输入框文字颜色：#333；
+弹窗：左右padding：24px；上padding16px；标题区高度：48px，标题字号16px加粗，下边框颜色#DFE2EB，底部操作区右边距24px，上下边距16px，按钮之间间隙8px；
+*/
+/* 按钮样式 */
+.mpi-container .el-button--primary{
+    border-color: #0480FF;
+    background-color: #0480FF;
+}
+.mpi-container .el-button--primary:hover{
+    background-color: #72A7fC;
+    border-color: #72A7fC;
+}
+.mpi-container .el-button--primary:focus{
+    background-color: #2678FC;
+    border-color: #2678FC;
+}
+.mpi-container .el-button--default {
+    color: #333;
+}
+.mpi-container .el-button {
+    margin-left: 8px !important;
+}
+.mpi-container .el-button.el-button--default.is-plain {
+        color: #0480FF;
+        background: #fff !important;
+        border-color: #0480FF;
+}
+.mpi-container .el-button.el-button--default.is-plain:hover {
+    background: #EBF4FF !important;
+}
+.mpi-container .el-button.el-button--default.is-plain:focus {
+    background: #D3E6FE !important;
+    color: #2678FC;
+    border-color: #2678FC;
+}
+/* 表单样式 */
+.mpi-container .el-form-item__label {
+    font-weight: normal !important;
+    padding: 0;
+    color: #333;
+}
+.mpi-container .el-input__inner {
+    padding-left: 10px;
+    padding-right: 10px;
+    color: #333;
+}
+.mpi-container .el-input-number.is-controls-right .el-input__inner {
+    padding-left: 10px;
+    padding-right: 38px;
+}
+/* 弹窗样式 */
+.mpi-container .el-dialog__body {
+    padding-top: 16px !important;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+.mpi-container .el-dialog__header {
+    border-bottom: 1px solid #DFE2EB;
+    height: 48px;
+    padding: 0 20px;
+}
+.mpi-container .el-dialog__headerbtn {
+    top: 14px;
+}
+.mpi-container .el-dialog__title {
+    font-size: 16px;
+    line-height: 48px;
+    font-weight: bold;
+}
+.mpi-container .el-dialog__footer {
+    padding: 16px 24px;
+}
+.mpi-container .dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+.mpi-container .el-dialog__footer .el-button {
+    margin-left: 8px !important;
+}
+.mpi-container .el-pagination {
+    display: flex;
+    justify-content: flex-end;
+    padding: 16px 0;
+}
+.mpi-container .cell label.el-checkbox {
+    margin-bottom: 0;
+}
+/* ----------------------------------------------------------- */
+/* .el-message-box .el-button--primary{
+    border-color: #0480FF;
+    background-color: #0480FF;
+}
+.el-message-box .el-button{
+   margin-left: 8px !important;
+} */
+
+/* 以下为mpi用到的公共样式，弹窗操作区阴影和抽屉样式 */
+
+/* 弹窗个性化样式,footer阴影 */
+.dialog-footer-shadow .el-dialog__footer{
+    box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+}
+/* 抽屉个性化样式：加在body全局样式不起效果 */
+.drawer .el-drawer__body {
+    padding-top: 16px;
+    padding-left: 24px;
+    padding-right: 24px;
+    padding-bottom: 16px;
+}
+.drawer .el-drawer__header {
+    border-bottom: 1px solid #DFE2EB;
+    height: 48px;
+    padding: 0 24px;
+    font-size: 16px;
+    line-height: 48px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 0px;
+}
+.drawer .el-drawer__headerbtn {
+    top: 14px;
+}

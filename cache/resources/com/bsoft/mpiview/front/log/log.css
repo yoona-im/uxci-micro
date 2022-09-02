@@ -1,0 +1,111 @@
+.log .fl {
+    float: left;
+}
+
+.log .fr {
+    float: right;
+}
+
+.log .blue {
+    color: #4088FE;
+}
+
+.log .red {
+    color: #FC5154;
+}
+
+.log .mt20 {
+    margin-top: 20px;
+}
+
+.log .hand {
+    cursor: pointer;
+}
+
+.log {
+    padding: 20px;
+    height: 100%;
+    min-width: 1100px;
+}
+
+.log .detail-row {
+    border: 1px solid #D5D6DB;
+    height: 100%;
+}
+.log .detail-row>.el-col {
+    height: 100%;
+}
+.log .detail-row .CodeMirror  {
+    /* height: 100%;
+     */
+    height: calc(100% - 42px);
+}
+.log .detail-row .contentt-row {
+    height: 100%;
+}
+.log .bl {
+    border-left: 1px solid #D5D6DB;
+}
+
+.log .title {
+    padding: 10px;
+    border-bottom: 1px solid #D5D6DB;
+    background-color: #EBF4FF;
+    font-weight: bold;
+}
+
+.log .red .CodeMirror-lines {
+    color: red;
+}
+
+.log .el-form-item__label {
+    font-weight: normal !important;
+}
+
+.log .log-table {
+    height: calc(100% - 122px);
+}
+
+.log .log-expand .el-table__expand-column .cell {
+    display: none;
+}
+.log .scroll-dialog .el-dialog__body {
+    height: 58vh;
+    padding-top: 10px;
+    overflow-y: scroll;
+}
+.log .detail-dialog .el-dialog__body {
+    height: 68vh;
+    padding-top: 10px;
+}
+.log .el-form-item{
+    margin-bottom: 8px;
+}
+.log .search-row {
+    display: flex;
+    flex-wrap: wrap;
+}
+.log .search-row>div {
+    width: 20%;
+}
+.log .operate-tip .cell span{
+    overflow:hidden;
+    display: inline-block;
+    width: 100%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.log .el-loading-mask{
+    z-index: 200 !important;
+}
+body .time-r .el-date-table th{
+    text-align: center !important;
+}
+/* .log .detail-dialog .el-dialog__body {
+    height: 68vh;
+} */
+/* @media screen and (min-width: 1920px) {
+    .log .search-row>div {
+      width: 16.66%;
+    }
+  } */

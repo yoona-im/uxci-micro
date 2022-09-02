@@ -1,0 +1,191 @@
+    <div class="docSearch-main-view" style="min-width: 1100px;">
+        <div
+                style="position: absolute; height: 10px; top: 0; left: 0; right: 0; z-index: 999; background-color: #f7f4f8;"></div>
+        <div style="width: 100%;height: 100%; font-size: 14px;"> <!-- -webkit-user-select: none;-->
+            <div id="conditionDiv" :class="'animated faster ' + animatedCss[conditionShow]"
+                 style="width: 100%; height: 92px;">
+                <div style="height: 10px;"></div>
+                <el-row :gutter="10" style="width: 100%">
+                    <el-col :span="6">
+                        <span style="margin-left: 30px">患者姓名：</span>
+                        <el-input size="mini" style="width: 160px" v-model="searchData.name"
+                                  @keyup.enter.native="queryPatients" ref="searchName"></el-input>
+                    </el-col>
+                    <el-col :span="6">
+                        <span style="margin-left: 30px">身份证号：</span>
+                        <el-input size="mini" style="width: 160px" v-model="searchData.idcard"
+                                  @keyup.enter.native="queryPatients"></el-input>
+                    </el-col>
+                    <el-col :span="6">
+                        <span style="margin-left: 30px">患者电话：</span>
+                        <el-input size="mini" style="width: 160px" v-model="searchData.iphone"
+                                  @keyup.enter.native="queryPatients"></el-input>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="10" style="width: 100%">
+                    <el-col :span="6">
+                        <span style="margin-left: 30px">住院号码：</span>
+                        <el-input size="mini" style="width: 160px" v-model="searchData.hospizationId"
+                                  @keyup.enter.native="queryPatients"></el-input>
+                    </el-col>
+                    <el-col :span="6">
+                        <span style="margin-left: 30px">门诊号码：</span>
+                        <el-input size="mini" style="width: 160px" v-model="searchData.clinicId"
+                                  @keyup.enter.native="queryPatients"></el-input>
+                    </el-col>
+                    <el-col :span="6">
+                        <span style="margin-left: 30px">医保卡号：</span>
+                        <el-input size="mini" style="width: 160px"
+                                  v-model="searchData.healthInsuranceCardId"
+                                  @keyup.enter.native="queryPatients"></el-input>
+                    </el-col>
+                    <el-col :span="6">
+                        <div class="grid-content" style="line-height: 36px">
+                            <el-button type="primary" size="mini" @click="queryPatients" >查询</el-button>
+                            <el-button size="mini" @click="initSearchData" >重置</el-button>
+                        </div>
+                    </el-col>
+                </el-row>
+            </div>
+
+            <div id="bottomDiv" style="border-top: 1px #e9e9e9 solid;background-color: #fff;min-width: 1100px;"
+                 :class="'animated faster ' + animatedCssTop[conditionShow]">
+                <!--收缩按钮-->
+                <div id="searchShowDiv" class="searchShow" @click="changeSearchDiv">
+                    <div style="">
+                        <img v-show="conditionShow != 1" src="resources/com/bsoft/bsoftdms/front/lib/js/echarts/images/up.png"
+                             style="width: 100px; height: 20px;">
+                        <img v-show="conditionShow == 1" src="resources/com/bsoft/bsoftdms/front/lib/js/echarts/images/down.png"
+                             style="width: 100px; height: 20px;">
+                        <!--<i class="iconfont icon-U" style="color: #E5E5E5"></i>-->
+                        <!--<i :class="'searchShowicon iconfont '+ searchShowIcon[conditionShow]"></i>-->
+                    </div>
+                </div>
+
+                <div class="bottomDiv2"
+                     style="min-width: 1100px;position: absolute; bottom: 0px; top: 0px;left: 10px; right: 10px;">
+                    <!--查询到内容-->
+                    <div style="width: 100%; position: absolute; bottom: 0; top: 0;" v-show="!isNone">
+                        <div
+                                style="width: 100%; height: 64px;line-height: 64px; background-color: #ebf7ff;font-size: 14px; position: relative">
+                            <div
+                                    style="display: inline-block;line-height: 64px;text-indent: 8px;margin-left: 20px;float: left;">
+                                <i :style="'font-size: 24px;float: left; color:'+ headColor[choosePatientInfo.sex =='*' ? 3 : choosePatientInfo.sex]"
+                                   :class="sexIcon[choosePatientInfo.sex == '*'?1:0]"></i>
+                                <span style="font-size: 15px; font-weight: 700"> {{choosePatientInfo.name}}</span>
+                            </div>
+                            <div style=" text-indent: 20px;display: inline-block;float: left;"
+                                 v-show="choosePatientInfo.sex != null"> {{sexDic[choosePatientInfo.sex]}}
+                            </div>
+                            <div style="display: inline-block;float: left;">
+                                <i style="font-size: 15px; text-indent: 20px;float: left; color: #0D99E4"
+                                   class="iconfont iconwdjs_tel" v-show="choosePatientInfo.patientPhone != null"></i>
+                                {{choosePatientInfo.patientPhone}}
+                            </div>
+                            <div style="text-indent: 30px;display: inline-block;float: left;"
+                                 v-show="choosePatientInfo.idCard != null">身份证：{{choosePatientInfo.idCard}}
+                            </div>
+                            <div style="text-indent: 30px;display: inline-block;float: left;"
+                                 v-show="choosePatientInfo.healthInsuranceCardId != null">
+                                医保卡号：{{choosePatientInfo.healthInsuranceCardId}}
+                            </div>
+                            <div style="text-indent: 30px;display: inline-block;float: left;"
+                                 v-show="choosePatientInfo.clinicId != null">门诊号：{{choosePatientInfo.clinicId}}
+                            </div>
+                            <div @click="showMorePatient"
+                                 style="float: left;text-indent: 5px;display: inline-block; position: absolute; right: 60px;cursor: pointer;">
+                                <i style="font-size: 15px; float: left; color: #0D99E4"
+                                   :class="'iconfont '+ morePatientIcon[morePatient]"></i>
+                                {{morePatientText[morePatient]}}
+                            </div>
+                        </div>
+
+                        <!--遮罩层-->
+                        <div :class="'choosePatientDiv maskLayer  '+ morePatientLayerCss[morePatient]"></div>
+                        <div :class="'choosePatientDiv  '+ morePatientLayerCss[morePatient]" style="overflow-y: auto">
+                            <!--:class="morePatientCss[morePatient]"-->
+                            <el-table
+                                    v-loading="tableLoading"
+                                    @row-click="patientChoose"
+                                    :class="morePatientCss[morePatient]"
+                                    highlight-current-row
+                                    :data="patientInfos">
+                                <el-table-column
+                                        prop="name"
+                                        header-align="center"
+                                        align="center"
+                                        width="180"
+                                        label="姓名">
+                                </el-table-column>
+                                <el-table-column
+                                        prop="sex"
+                                        header-align="center"
+                                        align="center"
+                                        width="100"
+                                        label="性别">
+                                    <template slot-scope="scope">
+                                        <span>{{scope.row['sex'].indexOf('*')!='-1' ? scope.row['sex'] : sexDic[scope.row['sex']]}}</span>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column
+                                        prop="idCard"
+                                        header-align="center"
+                                        align="center"
+                                        label="身份证号">
+                                </el-table-column>
+                                <el-table-column
+                                        prop="patientPhone"
+                                        header-align="center"
+                                        align="center"
+                                        label="患者电话">
+                                </el-table-column>
+                                <el-table-column
+                                        prop="healthInsuranceCardId"
+                                        header-align="center"
+                                        align="center"
+                                        label="医保卡号">
+                                </el-table-column>
+                                <el-table-column
+                                        prop="privacysign"
+                                        header-align="center"
+                                        align="center"
+                                        label="重点病人">
+                                    <template slot-scope="scope">
+                                        <i style="font-size: 13px;"
+                                           :class="'iconfont icongxwdjs_star ' + starrColor[scope.row['privacysign']]"></i>
+                                    </template>
+                                </el-table-column>
+                                <!--<el-table-column-->
+                                <!--prop="clinicId"-->
+                                <!--header-align="center"-->
+                                <!--align="center"-->
+                                <!--label="门诊号">-->
+                                <!--</el-table-column>-->
+                            </el-table>
+                        </div>
+
+
+                        <docSearchMain v-show="menuLevel == 0"
+                                       ref="docSearchMain"
+                                       v-on:showMenu='showMenu'>
+                        </docSearchMain>
+
+                        <docSearchChild v-show="menuLevel == 1"
+                                        ref="docSearchChild"
+                                        v-on:showMenu='showMenu'
+                                        :data="this.choosePatientInfo">
+                        </docSearchChild>
+
+                    </div>
+                    <!--缺省-->
+                    <div style="width: 100%; position: absolute; bottom: 0px; top: 0px;" v-show="isNone">
+                        <div class="defaultImage">
+                            <img src="resources/com/bsoft/bsoftdms/front/lib/js/echarts/images/default.png" style="width: 300px; height: 240px;">
+                            <p style="text-align: center">未检索到相关文件</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+

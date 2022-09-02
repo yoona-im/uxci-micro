@@ -1,0 +1,2379 @@
+<!-- 数据采集管理2页面 -->
+<el-container class="mainContainer">
+  <el-container v-if="medicalRecord&&isScreenFull">
+    <el-header :class="{'hiddenhead': !medicalRecord}">
+      <!-- 展开/收起 -->
+      <div class="expansionOrCollapse" @click="handleClick">
+        <div v-if="isShow" class="expansionOrCollapseDiv">
+          <span>展开</span>
+          <i class="el-icon-arrow-down">
+        </div>
+        <div v-if="!isShow" class="expansionOrCollapseDiv">
+          <span>收起</span>
+          <i class="el-icon-arrow-up">
+        </div>
+      </div>
+      <!-- 流程图 -->
+      <div class="headTotal">
+        <div id="container" class="headCircle">
+          <img class="imgStyle" src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/1.png" alt="">
+          <span class="imgSpan ">源库</span>
+          <div class="heaadLine" />
+          <div class="headtrigger" />
+          <div class="headTitle">
+            {{logCollectionSpeed}}条/s
+          </div>
+        </div>
+        <div class="headPic" :class="isBlue?'headPic1': ''">
+          <span class="headPicTitle" :class="isBlue?'headPicTitleColor': ''">日志采集</span>
+          <img class="imgStyle1" src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/2.png" alt=""
+            @click="getLogScript">
+          <span>{{logCollectLength}}台</span>
+          <div class="headPic_div " :class="isBlue?'headPic_div1': ''" @click="getLogScripts">
+            <i class="el-icon-check checkedStyle" />
+          </div>
+          <div class="heaadLine heaadLine1" />
+        </div>
+        <div id="container" class="headCircle" @click="getLogLibrary">
+          <div style="position: relative;">
+            <img class="imgStyle" src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/1.png"
+              alt="">
+            <span class="imgSpan">日志库</span>
+          </div>
+          <div>
+            <span class="headCircleSpan">{{totalErrorCounts}}</span>/
+            <span>{{totalCounts}}</span>
+          </div>
+          <div class="heaadLine" />
+          <div class="headtrigger" />
+          <div class="headTitle">
+            {{dataCollectCompressSpeed}}条/s
+          </div>
+        </div>
+        <div class="headPic" :class="!isBlue?'headPic1': ''">
+          <span class="headPicTitle" :class="!isBlue?'headPicTitleColor': ''">数据采集</span>
+          <img class="imgStyle1" src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/2.png" alt=""
+            @click="getDataScript">
+          <span>{{dataCollectLength}}台</span>
+          <div class="headPic_div " :class="!isBlue?'headPic_div1': ''" @click="getDataScripts">
+            <i class="el-icon-check checkedStyle" />
+          </div>
+          <div class="heaadLine heaadLine2" />
+        </div>
+        <div class="headPic" style="border: 0;" @click="getHeadEcharts(1)">
+          <span style="font-size: 16px;">前置机</span>
+          <img class="imgStyle1" src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/2.png"
+            alt="">
+          <span>{{qianzhijiLength}}台</span>
+          <div class="heaadLine heaadLine3" />
+        </div>
+        <div id="container" class="headCircle" @click="queryFrontLibraryList">
+          <div style="position: relative;">
+            <img class="imgStyle" src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/1.png"
+              alt="">
+            <span class="imgSpan imgSpan1">前置机库</span>
+          </div>
+          <div>
+            <span class="headCircleSpan">{{qianzhijiErrorTotal}}</span>/<span>{{qianzhijiTotal}}</span>
+          </div>
+          <div class="heaadLine" />
+          <div class="headtrigger" />
+        </div>
+        <div class="headPic " style="border: 0;" @click="getHeadEcharts(2)">
+          <span style="font-size: 16px;">解包</span>
+          <img class="imgStyle1" src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/2.png"
+            alt="">
+          <span>{{solvePackageLength}}台</span>
+          <div class="heaadLine heaadLine3" />
+          <div class="headtrigger headtrigger1" />
+          <div class="headTitle headTitle1">
+            {{decompressSpeed}}条/s
+          </div>
+        </div>
+        <div id="container" class="headCircle">
+          <img class="imgStyle" src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/3.png" alt="">
+          <span class="imgSpan imgSpan2">目标库</span>
+        </div>
+      </div>
+    </el-header>
+    <el-container class="ELContainer">
+      <div class="elContainerLeft">
+        <el-aside width="230px">
+          <el-select class="searchKeys" v-model="value" placeholder="请选择" size="small" @change="changeOrganization">
+            <el-option v-for="item in organizationOptions" :key="item.id" :label="item.orgName" :value="item.orgCode" />
+          </el-select>
+          <!-- <el-input class="searchKeys" size="small" placeholder="请输入关键字搜索" suffix-icon="el-icon-search"
+            v-model="searchKey"  @keyup.enter.native="searchModelKey"/> -->
+          <el-input class="searchKeys" size="small" placeholder="请输入关键字搜索" v-model="searchKey"
+            @keyup.enter.native="searchModelKey">
+            <i slot="suffix" class="el-icon-search el-input__icon" @click="searchModelKey" style="cursor: pointer;"></i>
+          </el-input>
+          <div class="elContainerLeftDiv">
+            <el-tree class="LEftTree" ref="leftTree" node-key="id" :data="treeData" :props="defaultProps"
+              :filter-node-method="filterNode" @node-click="handleNodeClick" default-expand-all>
+              <span class="custom-tree-node" slot-scope="{ node, data }">
+                <i v-if="node.expanded==false&&data.children&&data.children.length>0" class="el-icon-folder" />
+                <i v-if="node.expanded==true&&data.children&&data.children.length>0" class="el-icon-folder-opened" />
+                <span>{{node.label}}</span>
+              </span>
+            </el-tree>
+          </div>
+        </el-aside>
+      </div>
+      <div class="rightMain" :style="">
+        <el-main>
+          <div class="right" style="height: 100%;">
+            <div class="rightHead">
+              <div class="rightHeadLeft">
+                <span>状态：</span>
+                <el-checkbox-group v-model="checkList" @change="changeStatus">
+                  <el-checkbox :label="1">启动</el-checkbox>
+                  <el-checkbox :label="2">暂停</el-checkbox>
+                  <el-checkbox :label="0">停止</el-checkbox>
+                </el-checkbox-group>
+                <el-input style="width: 230px;margin-left: 10px;" size="small" placeholder="请输入任务名称/任务代码搜索"
+                  v-model="searchRightKey" @keyup.enter.native="searchList">
+                  <i slot="suffix" class="el-input__icon el-icon-search" style="color: #0480FF;cursor: pointer;"
+                    @click="searchList" />
+                </el-input>
+              </div>
+              <div class="rightHeadRight" style="cursor: pointer;">
+                <el-tooltip v-if="isLogOrData" class="item" effect="dark" content="临时采集" placement="top-start">
+                  <i class="icons" @click="temporaryCollect" v-if="isLogOrData">
+                    <img class="iconPicture"
+                      src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/8.png" alt="">
+                  </i>
+                </el-tooltip>
+
+                <el-tooltip v-if="!isLogOrData" class="item" effect="dark" content="测试" placement="top-start">
+                  <i class="icons" @click="collectTest" v-if="!isLogOrData">
+                    <img class="iconPicture"
+                      src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/9.png" alt="">
+                  </i>
+                </el-tooltip>
+
+
+                <el-tooltip class="item" effect="dark" :content="detailMode?'精简模式': '详情模式'" placement="top-start">
+                  <i class=" icons" @click="modeToggleClick">
+                    <img class="iconPicture"
+                      src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/10.png" alt="">
+                  </i>
+                </el-tooltip>
+
+
+                <el-tooltip class="item" effect="dark" content="刷新" placement="top-start">
+                  <i class=" icons" @click="refreshTable">
+                    <img class="iconPicture"
+                      src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/ico_opt_refresh.png"
+                      alt="">
+                  </i>
+                </el-tooltip>
+
+
+                <el-tooltip class="item" effect="dark" content="新增" placement="top-start">
+                  <i class=" icons" @click="addLog">
+                    <img class="iconPicture"
+                      src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/ico_doc_add.png" alt="">
+                  </i>
+                </el-tooltip>
+
+
+                <el-tooltip class="item" effect="dark" content="修改" style="position: relative;" placement="top-start">
+                  <i class=" icons" @click="updateLog" @mouseenter="inDomeBatchEdit" @mouseleave="outDomeBatchEdit">
+                    <img class="iconPicture"
+                      src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/ico_opt_edit.png"
+                      alt="">
+                    <div v-if="batchEditShow" class="hoverDiv" @click.stop="scriptBatchClick">批量修改采集策略</div>
+                  </i>
+                </el-tooltip>
+
+
+                <el-tooltip class="item" effect="dark" content="复制" placement="top-start">
+                  <i class=" icons" @click="copy">
+                    <img class="iconPicture"
+                      src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/ico_opt_copy.png"
+                      alt="">
+                  </i>
+                </el-tooltip>
+
+
+                <el-tooltip class="item" effect="dark" content="删除" placement="top-start">
+                  <i class="icons" @click="tipsClick">
+                    <img class="iconPicture"
+                      src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/ico_operate_delete.png"
+                      alt="">
+                  </i>
+                </el-tooltip>
+
+                <!-- 日志采集启动/暂停 @mouseenter="inDome" @mouseleave="outDome"-->
+                <span v-if="isLogOrData">
+                  <el-tooltip class="item" effect="dark" content="启动" placement="top-start">
+                    <i class="icons " @click="startLogCollect" style="position: relative;" @mouseenter="inDomeLogStart"
+                      @mouseleave="outDomeLogStart">
+                      <img class="iconPicture"
+                        src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/ico_opt_vedio_play.png"
+                        alt="">
+                      <div v-if="isShowLogStart" class="hoverDiv" @click.stop="startLogAll">全部启动</div>
+                    </i>
+                  </el-tooltip>
+
+
+                  <el-tooltip class="item" effect="dark" content="暂停" placement="top-start">
+                    <i class=" icons" @click="stopLogCollect" style="position: relative;" @mouseenter="inDomeLogStop"
+                      @mouseleave="outDomeLogStop">
+                      <img class="iconPicture"
+                        src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/ico_opt_vedio_pause.png"
+                        alt="">
+                      <div v-if="isShowLogStop" class="hoverDiv" @click.stop="pauseLogAll">全部暂停</div>
+                    </i>
+                  </el-tooltip>
+
+
+                  <el-tooltip class="item" effect="dark" content="停止" placement="top-end">
+                    <i class=" icons" @click="resetLogCollect" style="position: relative;" @mouseenter="inDomeLogReset"
+                      @mouseleave="outDomeLogReset">
+                      <img class="iconPicture"
+                        src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/ico_opt_vedio_stop.png"
+                        alt="">
+                      <div v-if="isShowLogReset" class="hoverDiv hoverDiv1" @click.stop="stopLogAll">全部停止</div>
+                    </i>
+                  </el-tooltip>
+
+                </span>
+                <!-- 数据采集启动/暂停 @mouseenter="inDome" @mouseleave="outDome"-->
+                <span v-if="!isLogOrData">
+                  <el-tooltip class="item" effect="dark" content="启动" placement="top-start">
+                    <i class="icons" @click="startDataCollectTask" style="position: relative;"
+                      @mouseenter="inDomeDataStart" @mouseleave="outDomeDataStart">
+                      <img class="iconPicture"
+                        src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/ico_opt_vedio_play.png"
+                        alt="">
+                      <div v-if="isShowDataStart" class="hoverDiv" @click.stop="startDataAll">全部启动</div>
+                    </i>
+                  </el-tooltip>
+
+
+                  <el-tooltip class="item" effect="dark" content="暂停" placement="top-start">
+                    <i class=" icons" @click="pauseDataCollectTask" style="position: relative;"
+                      @mouseenter="inDomeDataPause" @mouseleave="outDomeDataPause">
+                      <img class="iconPicture"
+                        src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/ico_opt_vedio_pause.png"
+                        alt="">
+                      <div v-if="isShowDataPause" class="hoverDiv" @click.stop="pauseDataAll">全部暂停</div>
+                    </i>
+                  </el-tooltip>
+
+
+                  <el-tooltip class="item" effect="dark" content="停止" placement="top-end">
+                    <i class=" icons" @click="stopDataCollectTask" style="position: relative;"
+                      @mouseenter="inDomeDataStop" @mouseleave="outDomeDataStop">
+                      <img class="iconPicture"
+                        src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/ico_opt_vedio_stop.png"
+                        alt="">
+                      <div v-if="isShowDataStop" class="hoverDiv hoverDiv1" @click.stop="stopDataAll">全部停止</div>
+                    </i>
+                  </el-tooltip>
+
+                </span>
+              </div>
+            </div>
+            <div class="rightTable">
+              <!-- 日志采集 -->
+              <el-table v-if="isLogOrData" ref="dataTables" class="ststus logCollectClass" border :data="tableData"
+                :header-cell-style="getLogStyle" highlight-current-row :row-class-name="tableRowClassName"
+                :span-method="mergeLogDataTable" @cell-click="clickDataRow" @select="selectLogCollectAll"
+                @select-all="selectLogCollectAll" @row-dblclick="clickDoubleDataRow" height="calc(100% - 50px)"
+                style="width: 100%;">
+                <el-table-column type="selection" width="55" />
+                <el-table-column show-overflow-tooltip prop="ORGANIZATIONNAME" label="机构">
+                </el-table-column>
+                <el-table-column show-overflow-tooltip prop="NAME" label="任务名称">
+                </el-table-column>
+                <el-table-column show-overflow-tooltip prop="ETLTASKCODE" label="任务代码">
+                </el-table-column>
+                <el-table-column show-overflow-tooltip prop="LOGTABLENAME" label="日志表">
+                </el-table-column>
+                <el-table-column label="数据量" width="120">
+                  <template slot-scope="{row}">
+                    <span style="border-bottom: 1px solid #999999;cursor: pointer;" @click="getLogLibrary(row)">
+                      <span
+                        :style="{color: (row.errorCount > 0 ? '#FF3034' : '#000')}">{{row.errorCount}}</span>/<span>{{row.totalCount}}</span></span>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="LOGSTATUS" label="状态" width="55">
+                  <template slot-scope="{row}">
+                    <div @mouseenter="inDomePause" @mouseleave="outDomePause">
+                      <span v-if="isLogOrData&&row.LOGSTATUS===1" class="start">启动</span>
+                      <span v-if="isLogOrData&&row.LOGSTATUS===2" class="pause">暂停</span>
+                      <span v-if="isLogOrData&&row.LOGSTATUS===0" class="stop">停止</span>
+                    </div>
+
+                  </template>
+                </el-table-column>
+                <!-- 详情模式 -->
+                <template v-if="detailMode">
+                  <el-table-column prop="GATHERTIME" label="采集时间" width="100">
+                    <template slot-scope="{row}" v-if="isLogOrData&&row.GATHERTIME">
+                      <div style="text-align: center;">
+                        <span v-if="isLogOrData&&row.GATHERTIME">{{row.GATHERTIME.split()[0]}}</span>
+                        <span v-if="isLogOrData&&row.GATHERTIME">{{row.GATHERTIME.split()[1]}}</span>
+                      </div>
+                    </template>
+                  </el-table-column>
+                  <el-table-column prop="STARTTIME" label="开始时间" width="100">
+                    <template slot-scope="{row}" v-if="isLogOrData&&row.STARTTIME">
+                      <div style="text-align: center;">
+                        <span v-if="isLogOrData&&row.STARTTIME">{{row.STARTTIME.split()[0]}}</span>
+                        <span v-if="isLogOrData&&row.STARTTIME">{{row.STARTTIME.split()[1]}}</span>
+                      </div>
+                    </template>
+                  </el-table-column>
+                  <el-table-column prop="ENDTIME" label="截止时间" width="100">
+                    <template slot-scope="{row}" v-if="isLogOrData&&row.ENDTIME">
+                      <div style="text-align: center;">
+                        <span v-if="isLogOrData&&row.ENDTIME">{{row.ENDTIME.split()[0]}}</span>
+                        <span v-if="isLogOrData&&row.ENDTIME">{{row.ENDTIME.split()[1]}}</span>
+                      </div>
+                    </template>
+                  </el-table-column>
+                  <!-- <el-table-column prop="gatherCount" label="业务数量" width="80">
+                </el-table-column> -->
+                  <el-table-column show-overflow-tooltip prop="SCRIPTNAME" label="执行脚本" width="80">
+                    <template slot-scope="{row}" v-if="isLogOrData">
+                      <span @click="getLogCollectSql(row)" style="cursor: pointer;"
+                        class="executeScript">{{!row.SCRIPTNAME&&row.LOGID?'未配置':row.SCRIPTNAME}}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column v-if="isLogOrData" prop="CRONEXPRESSION" label="采集策略" width="120">
+                  </el-table-column>
+                </template>
+                <el-table-column prop="DATASTATUS" label="数据采集" width="80">
+                  <template slot-scope="{row}">
+                    <span v-if="isLogOrData&&row.DATASTATUS===1" class="start">启动</span>
+                    <span v-if="isLogOrData&&row.DATASTATUS===2" class="pause">暂停</span>
+                    <span v-if="isLogOrData&&row.DATASTATUS===0" class="stop">停止</span>
+                  </template>
+                </el-table-column>
+              </el-table>
+
+              <!-- 数据采集  highlight-current-row -->
+              <el-table v-if="!isLogOrData" class="dataCollectClass" :data="dataTableData" border
+                :header-cell-style="getStyle" highlight-current-row :row-class-name="tableRowClassName"
+                @select="selectLogCollect" @select-all="selectLogCollect" @cell-click="clickDataRow"
+                @row-dblclick="clickDoubleDataRow" ref="handleDataTableData" height="calc(100% - 50px)"
+                style="width: 100%;">
+                <el-table-column type="selection" width="55" />
+                <el-table-column show-overflow-tooltip prop="ORGANIZATIONNAME" label="机构">
+                </el-table-column>
+                <el-table-column show-overflow-tooltip prop="NAME" label="任务名称">
+                </el-table-column>
+                <el-table-column show-overflow-tooltip prop="ETLTASKCODE" label="任务代码">
+                </el-table-column>
+                <el-table-column show-overflow-tooltip prop="LOGTABLENAME" label="日志表">
+                </el-table-column>
+                <el-table-column label="数据量" width="80">
+                  <template slot-scope="{row}">
+                    <span @click="getLogLibrary(row)" style="border-bottom: 1px solid #999999;"><span
+                        :style="{color: (row.errorCount > 0 ? '#FF3034' : '#000')}">{{row.errorCount}}</span>/<span>{{row.totalCount}}</span></span>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="LOGSTATUS" label="日志采集" width="80">
+                  <template slot-scope="{row}">
+                    <span v-if="row.LOGSTATUS===1" class="start">启动</span>
+                    <span v-if="row.LOGSTATUS===2" class="pause">暂停</span>
+                    <span v-if="row.LOGSTATUS===0" class="stop">停止</span>
+                  </template>
+                </el-table-column>
+                <!-- 详情模式 -->
+                <template v-if="detailMode">
+                  <el-table-column prop="DATASTATUS" label="状态" width="80">
+                    <template slot-scope="{row}">
+                      <span v-if="!isLogOrData&&row.DATASTATUS===1" class="start">启动</span>
+                      <span v-if="!isLogOrData&&row.DATASTATUS===2" class="pause">暂停</span>
+                      <span v-if="!isLogOrData&&row.DATASTATUS===0" class="stop">停止</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column show-overflow-tooltip v-if="!isLogOrData" prop="INTERFACE" label="输出接口" width="80">
+                  </el-table-column>
+                  <el-table-column v-if="!isLogOrData" prop="TOTAL" label="日志获取数量" width="110">
+                  </el-table-column>
+                  <el-table-column show-overflow-tooltip prop="SCRIPTNAME
+                  " label="执行脚本" width="120">
+                    <template slot-scope="{row}" v-if="!isLogOrData">
+                      <!-- toScript(row) -->
+                      <span @click="getFullScreen(row)" style="cursor: pointer;"
+                        class="executeScript">{{!row.SCRIPTNAME&&row.CONFIGID?'未配置':row.SCRIPTNAME}}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column prop="compressSpeed" label="采集速率" width="100">
+                  </el-table-column>
+                  <el-table-column prop="CRONEXPRESSION" label="采集策略" width="120">
+                    <template slot-scope="{row}" v-if="!isLogOrData&&!streamlineMode">
+                      <span>{{row.CRONEXPRESSION}}</span>
+                    </template>
+                  </el-table-column>
+                </template>
+                <!-- 精简模式 -->
+                <template v-if="!isLogOrData&&streamlineMode">
+                  <el-table-column prop="logCollection" label="状态" width="120">
+                    <template slot-scope="{row}">
+                      <span v-if="!isLogOrData&&streamlineMode&&row.DATASTATUS===1" class="start">启动</span>
+                      <span v-if="!isLogOrData&&streamlineMode&&row.DATASTATUS===2" class="pause">暂停</span>
+                      <span v-if="!isLogOrData&&streamlineMode&&row.DATASTATUS===0" class="stop">停止</span>
+                    </template>
+                  </el-table-column>
+                </template>
+              </el-table>
+              <div class="pagination">
+                <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                  :current-page="pagination.currentPage" :page-sizes="[5,10, 20, 30]" :page-size="pagination.pageSize"
+                  layout="total, prev, pager, next, sizes" :total="pagination.totalNum">
+                </el-pagination>
+              </div>
+            </div>
+        </el-main>
+      </div>
+    </el-container>
+    <div class="mainFooter">
+      <el-footer>
+        <div style="margin-right: 40px;">
+          <span><i>日志采集任务总数</i> {{logTotal.total}}个,</span>
+          <span><i style="color: #26BF40;">启动</i>： {{logTotal.start}}个，</span>
+          <span><i style="color: #FF3034;">停止</i>： {{logTotal.stop}}个，</span>
+          <span><i style="color: #FF9A26;">暂停</i>： {{logTotal.pause}}个，</span>
+        </div>
+        <div>
+          <span><i>数据集任务总数</i>: {{dataTotal.total}}个,</span>
+          <span><i style="color: #26BF40;">启动</i>： {{dataTotal.start}}个，</span>
+          <span><i style="color: #FF3034;">停止</i>： {{dataTotal.stop}}个，</span>
+          <span><i style="color: #FF9A26;">暂停</i>： {{dataTotal.pause}}个，</span>
+        </div>
+      </el-footer>
+    </div>
+  </el-container>
+  <!-- 大流程图显示 -->
+
+  <!-- 弹框 -->
+  <!-- 启动/全部启动弹框 -->
+  <div v-if="startShow" class="startShowDialog">
+    <div class="startUp" @click="clickStart">启动</div>
+    <div class="allStartUp" @click="clickAllStart">全部启动</div>
+  </div>
+  <!-- 精简模式/详情模式 -->
+
+  <!-- 启动/停止/暂停 v-if="pauseOrStopShow"-->
+  <div v-if="false" class="startShowDialog2">
+    <div class="startUp1" @click="pauseOrStopClick">启动</div>
+    <div class="startUp1" @click="pauseOrStopClick">停止</div>
+    <div class="allStartUp1" @click="pauseOrStopClick">暂停</div>
+  </div>
+  <!-- 新建/触发器配置 -->
+  <div v-if="addShow" class="startShowDialog">
+    <div class="startUp">新建</div>
+    <div class="allStartUp">触发器配置</div>
+  </div>
+  <!-- 临时采集 -->
+  <el-dialog append-to-body="true" :close-on-click-modal="false" :visible.sync="temporaryCollectDialogVisible"
+    width="420px" class="temporaryCollectDialogForm">
+    <div slot="title">
+      <span class="dialogTitle">临时执行</span>
+    </div>
+    <el-divider />
+    <el-form :model="temporaryCollectDialogForm" :rules="temporaryCollectDialogFormRules"
+      ref="temporaryCollectDialogForm" size="small" style="padding: 10px;margin-left: 50px;">
+      <el-form-item label="开始时间：" prop="hisStartTime">
+        <el-date-picker v-model="temporaryCollectDialogForm.hisStartTime" type="datetime"
+          value-format="yyyy-MM-dd HH:mm:ss" format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期">
+        </el-date-picker>
+      </el-form-item>
+      <el-form-item label="结束时间：" prop="hisEndTime">
+        <el-date-picker v-model="temporaryCollectDialogForm.hisEndTime" type="datetime"
+          value-format="yyyy-MM-dd HH:mm:ss" format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期">
+        </el-date-picker>
+      </el-form-item>
+    </el-form>
+    <span slot="footer" class="dialog-footer">
+      <el-button type="primary" size="small" @click="temporaryImplement ">执 行</el-button>
+      <el-button size="small" @click="temporaryCollectDialogVisible = false">取 消</el-button>
+    </span>
+  </el-dialog>
+  <!-- 新建日志采集配置弹框 -->
+  <el-dialog append-to-body="true" :close-on-click-modal="false" :visible.sync="addLogDialogVisible" width="790px">
+    <div slot="title">
+      <span class="dialogTitle">{{configTitle?'新建日志采集配置':'日志采集配置'}}</span>
+    </div>
+    <el-divider />
+    <el-form :model="addLogDialogForm" ref="addLogDialogForm" size="small" style="padding: 10px;"
+      :rules="addLogFormRules">
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="任务名称：" :label-width="formLabelWidth">
+            <el-input v-model="addLogDialogForm.name" style=" width: 240px;" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="任务代码：" :label-width="formLabelWidth">
+            <el-input :disabled="configCode" v-model="addLogDialogForm.etlTaskCode" style=" width: 240px;"
+              @input="limitEtlTaskCode" :maxlength="14" />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="开始时间：" :label-width="formLabelWidth" prop="startTime">
+            <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" format="yyyy-MM-dd HH:mm:ss" style=" width: 240px;"
+              v-model="addLogDialogForm.startTime" type="datetime" placeholder="请选择日期">
+            </el-date-picker>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="截止时间：" :label-width="formLabelWidth" prop="endTime">
+            <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" format="yyyy-MM-dd HH:mm:ss" style=" width: 240px;"
+              v-model="addLogDialogForm.endTime" type="datetime" placeholder="请选择日期">
+            </el-date-picker>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="采集跨度：" :label-width="formLabelWidth">
+            <el-input v-model="addLogDialogForm.dayCount" style="width:138px;"
+              oninput="value=value.replace(/[^0-9]/g,'')" />
+            <el-select v-model="addLogDialogForm.logTimeUnit" placeholder="请选择" style="width: 92px;">
+              <el-option v-for="item in times" :key="item.value" :label="item.label" :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="日志上限：" :label-width="formLabelWidth">
+            <el-input v-model="addLogDialogForm.limitCount" style=" width: 240px;" @input="limitLogInput" />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="采集时序：" :label-width="formLabelWidth">
+            <el-select v-model="addLogDialogForm.order" placeholder="请选择" style=" width: 240px;">
+              <el-option v-for="item in collectLogSequentials" :key="item.value" :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="采集延时：" :label-width="formLabelWidth">
+            <el-input v-model="addLogDialogForm.logBufferTime" style="width:138px;"
+              oninput="value=value.replace(/[^0-9]/g,'')" />
+            <el-select v-model="addLogDialogForm.logBufferTimeUnit" placeholder="请选择" style="width: 92px;">
+              <el-option v-for="item in collectTime" :key="item.value" :label="item.label" :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="指定LogCollect：" :label-width="formLabelWidth">
+            <el-select v-model="addLogDialogForm.compressInterface" placeholder="请选择" style=" width: 240px;">
+              <el-option v-for="item in compress" :key="item.id" :label="item.ip" :value="item.ip">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12" style="display: flex;">
+          <el-form-item label="执行策略：" :label-width="formLabelWidth">
+            <el-select v-model="addLogDialogForm.cron" placeholder="请选择" style="width:200px;"
+              @change="selectScriptExpression">
+              <el-option v-for="item in implementStrategies" :key="item.id" :label="item.description"
+                :value="item.expression">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <div class="addLogIcon">
+            <!-- <i class="el-icon-edit-outline" style="margin-left: 8px;"  @click="implementStrategyClick"/>
+            <i class="el-icon-circle-plus-outline"  @click="implementStrategyClick"/> -->
+          </div>
+        </el-col>
+      </el-row>
+    </el-form>
+    <span slot="footer" class="dialog-footer">
+      <el-button type="primary" size="small" @click="createLogCollect ">保 存</el-button>
+      <el-button size="small" @click="addLogDialogVisible = false">取 消</el-button>
+    </span>
+  </el-dialog>
+  <!-- 修改日志采集配置弹框 -->
+  <el-dialog append-to-body="true" :close-on-click-modal="false" :visible.sync="updateLogDialogVisible" width="790px"
+    ref="addLogDialog">
+    <div slot="title">
+      <span class="dialogTitle">修改日志采集配置</span>
+    </div>
+    <el-divider />
+    <el-form :model="updateLogDialogForm" :rules="updateLogFormRules" ref="updateLogDialogForm" size="small"
+      style="padding: 10px;">
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="任务名称：" :label-width="formLabelWidth">
+            <el-input v-model="updateLogDialogForm.NAME" style=" width: 240px;" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="任务代码：" :label-width="formLabelWidth">
+            <el-input disabled v-model="updateLogDialogForm.ETLTASKCODE" style=" width: 240px;" />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="开始时间：" :label-width="formLabelWidth" prop="STARTTIME">
+            <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" format="yyyy-MM-dd HH:mm:ss" style=" width: 240px;"
+              v-model="updateLogDialogForm.STARTTIME" type="datetime" placeholder="请选择日期">
+            </el-date-picker>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="截止时间：" :label-width="formLabelWidth" prop="ENDTIME">
+            <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" format="yyyy-MM-dd HH:mm:ss" style=" width: 240px;"
+              v-model="updateLogDialogForm.ENDTIME" type="datetime" placeholder="请选择日期">
+            </el-date-picker>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="采集跨度：" :label-width="formLabelWidth">
+            <el-input v-model="updateLogDialogForm.DAYCOUNT" style="width:138px;"
+              oninput="value=value.replace(/[^0-9]/g,'')" />
+            <el-select v-model="updateLogDialogForm.LOGTIMEUNIT" placeholder="请选择" style="width: 92px;">
+              <el-option v-for="item in times" :key="item.value" :label="item.label" :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="日志上限：" :label-width="formLabelWidth">
+            <el-input v-model="updateLogDialogForm.LIMITCOUNT" style=" width: 240px;" @input="limitLogInput" />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="采集时序：" :label-width="formLabelWidth">
+            <el-select v-model="updateLogDialogForm.TIMEORDER" placeholder="请选择" style=" width: 240px;">
+              <el-option v-for="item in collectLogSequentials" :key="item.value" :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="采集延时：" :label-width="formLabelWidth">
+            <el-input v-model="updateLogDialogForm.LOGBUFFERTIME" style="width:138px;"
+              oninput="value=value.replace(/[^0-9]/g,'')" />
+            <el-select v-model="updateLogDialogForm.LOGBUFFERTIMEUNIT" placeholder="请选择" style="width: 92px;">
+              <el-option v-for="item in collectTime" :key="item.value" :label="item.label" :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="指定LogCollect：" :label-width="formLabelWidth">
+            <el-select v-model="updateLogDialogForm.COMPRESSINTERFACE" placeholder="请选择" style=" width: 240px;">
+              <el-option v-for="item in compress" :key="item.id" :label="item.ip" :value="item.id">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12" style="display: flex;">
+          <el-form-item label="执行策略：" :label-width="formLabelWidth">
+            <el-select v-model="updateLogDialogForm.CRON" placeholder="请选择" style="width:200px;"
+              @change="selectScriptExpression">
+              <el-option v-for="item in implementStrategies" :key="item.id" :label="item.description"
+                :value="item.expression">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <div class="addLogIcon">
+            <!-- <i class="el-icon-edit-outline" style="margin-left: 8px;" />
+            <i class="el-icon-circle-plus-outline" /> -->
+          </div>
+        </el-col>
+      </el-row>
+    </el-form>
+    <span slot="footer" class="dialog-footer">
+      <el-button type="primary" size="small" @click="updateLogCollect ">保 存</el-button>
+      <el-button size="small" @click="updateLogDialogVisible = false">取 消</el-button>
+    </span>
+  </el-dialog>
+  <!-- 日志采集脚本配置弹框 -->
+  <el-dialog append-to-body="true" :close-on-click-modal="false" :visible.sync="logCollectDialogVisible" width="550px"
+    ref="logCollectDialog">
+    <div slot="title">
+      <span class="dialogTitle">日志采集脚本配置</span>
+    </div>
+    <el-divider />
+    <el-form class="logCollectDialogFormclass" :model="logCollectDialogForm" ref="logCollectDialogForm" size="small"
+      style="padding: 10px;" label-position="right">
+      <el-row style="padding-left: 25px;">
+        <el-col :span="12">
+          <el-form-item label="脚本名称：" style="margin-left: -15px;">
+            <el-input v-model="logCollectDialogForm.scriptName" style=" width: 160px;" />
+          </el-form-item>
+        </el-col>
+
+        <el-col :span="12">
+          <el-form-item label="导入脚本：">
+            <el-select v-model="logCollectDialogForm.logScriptName" placeholder="请选择" style="width:160px;"
+              @change="selectLogCatalogName">
+              <el-option v-for="item in implementScripts" :key="item.id" :label="item.catalogName" :value="item.id">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="数据源：">
+            <el-select ref="selectTree" v-model="logCollectDialogForm.hisDataSourceId" clearable placeholder="请选择"
+              style=" width: 160px;">
+              <el-option :value="logCollectDialogForm.hisDataSourceId" :label="logDataSourceIdName" style="height:auto">
+                <el-tree class="selectTree" :data="dataOrigins" node-key="id" :props="defaultPropsSourceId"
+                  highlight-current @node-click="SelectSourceId">
+                </el-tree>
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <!-- <el-form-item  label="版本：">
+            <el-input disabled v-model="logCollectDialogForm.version" style=" width: 160px;" />
+          </el-form-item> -->
+        </el-col>
+      </el-row>
+    </el-form>
+    <div style="padding: 0 35px;">
+      <div style="margin-top: -10px;margin-bottom: 10px;">
+        <el-radio-group v-model="radio">
+          <el-radio :label="'1'">SQL</el-radio>
+          <el-radio :label="'2'">存储过程</el-radio>
+        </el-radio-group>
+      </div>
+      <div v-if="radio==1" style="width: 100%;height: 190px;display:flex;border: 1px solid #DCDFE6;">
+        <div style="border-right: 1px solid #DCDFE6; padding: 5px 0;overflow: hidden;overflow-y: auto;">
+          <div style="width: 50px;height: 20px;text-align: center;" v-for="index in list" :key="index">
+            {{index}}
+          </div>
+        </div>
+        <el-input type="textarea" v-model="logCollectDialogForm.sql" resize="none" style="height: 100%;"
+          @input="changeHandler" />
+      </div>
+      <div v-if="radio==2" style="width: 100%;height:100%;">
+        <div style="display: flex;align-items: center;margin-bottom: 10px;">
+          <div style="margin-right: 10px;">名称：</div>
+          <el-input style="width: 300px;" size="mini" v-model="logCollectDialogForm.callName"></el-input>
+        </div>
+      </div>
+    </div>
+    <span slot="footer" class="dialog-footer">
+      <el-button type="primary" size="small" @click="savesLogCollectSql">保 存</el-button>
+      <el-button size="small" @click="logCollectDialogVisible = false">返 回</el-button>
+    </span>
+  </el-dialog>
+  <!-- 执行策略配置弹框 -->
+  <el-dialog append-to-body="true" :close-on-click-modal="false" :visible.sync="implementStrategyDialogVisible"
+    width="800px" ref="implementStrategyDialog">
+    <div slot="title">
+      <span class="dialogTitle">执行策略配置</span>
+    </div>
+    <el-divider />
+    <div class="checkBoxes" style="padding: 10px 24px 16px 24px">
+      <el-form :model="form" ref="implementStrategyDialogForm" size="small" style="padding: 10px;">
+        <el-row style="padding-left: 15px;margin-top: -12px;">
+          <el-col :span="10">
+            <el-form-item label="策略名称：">
+              <el-input v-model="form.strategyName" style=" width: 160px;" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="Corn表达式：">
+              <el-input v-model="form.CORECode" style=" width: 160px;" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-tabs type="border-card">
+          <el-tab-pane label="秒">
+            <div class="tabToggole">
+              <el-radio-group v-model="radio1">
+                <el-radio :label="1">每秒 允许的通配符[，—*/]</el-radio>
+                <el-radio :label="2">周期从
+                  <el-input-number v-model="num1" @change="handleChange" :min="0" :max="59" size="small" />
+                  至
+                  <el-input-number v-model="num2" @change="handleChange" :min="0" :max="59" size="small" />
+                  秒
+                </el-radio>
+                <el-radio :label="3">从
+                  <el-input-number v-model="num3" @change="handleChange" :min="0" :max="59" size="small" />
+                  秒开始，每
+                  <el-input-number v-model="num4" @change="handleChange" :min="0" :max="59" size="small" />
+                  秒执行一次
+                </el-radio>
+                <el-radio :label="4">
+                  <span>指定</span>
+                  <div style="margin: 12px 0 0 24px">
+                    <el-checkbox-group v-model="checkList">
+                      <el-checkbox label="00" />
+                      <el-checkbox v-for="index in 59" :key="index" :label="index >= 10 ? index : '0' + index" />
+                      <!-- <el-checkbox label="01"></el-checkbox>
+                    <el-checkbox label="02"></el-checkbox>
+                    <el-checkbox label="03"></el-checkbox>
+                    <el-checkbox label="04"></el-checkbox>
+                    <el-checkbox label="05"></el-checkbox>
+                    <el-checkbox label="06"></el-checkbox>
+                    <el-checkbox label="07"></el-checkbox>
+                    <el-checkbox label="08"></el-checkbox>
+                    <el-checkbox label="09"></el-checkbox> -->
+                    </el-checkbox-group>
+                  </div>
+                </el-radio>
+              </el-radio-group>
+            </div>
+          </el-tab-pane>
+          <el-tab-pane label="分钟">
+            <div class="tabToggole">
+              <el-radio-group v-model="radio1">
+                <el-radio :label="1">每分 允许的通配符[，—*/]</el-radio>
+                <el-radio :label="2">周期从
+                  <el-input-number v-model="num1" @change="handleChange" :min="0" :max="59" size="small" />
+                  至
+                  <el-input-number v-model="num2" @change="handleChange" :min="0" :max="59" size="small" />
+                  分钟
+                </el-radio>
+                <el-radio :label="3">从
+                  <el-input-number v-model="num3" @change="handleChange" :min="0" :max="59" size="small" />
+                  分钟开始，每
+                  <el-input-number v-model="num4" @change="handleChange" :min="0" :max="59" size="small" />
+                  分钟执行一次
+                </el-radio>
+                <el-radio :label="4">
+                  <span>指定</span>
+                  <div style="margin: 12px 0 0 24px">
+                    <el-checkbox-group v-model="checkList">
+                      <el-checkbox label="00" />
+                      <el-checkbox v-for="index in 59" :key="index" :label="index >= 10 ? index : '0' + index" />
+                    </el-checkbox-group>
+                  </div>
+                </el-radio>
+              </el-radio-group>
+            </div>
+          </el-tab-pane>
+          <el-tab-pane label="小时">
+            <div class="tabToggole">
+              <el-radio-group v-model="radio1">
+                <el-radio :label="1">每小时 允许的通配符[，—*/]</el-radio>
+                <el-radio :label="2">周期从
+                  <el-input-number v-model="num1" @change="handleChange" :min="0" :max="59" size="small" />
+                  至
+                  <el-input-number v-model="num2" @change="handleChange" :min="0" :max="59" size="small" />
+                  小时
+                </el-radio>
+                <el-radio :label="3">从
+                  <el-input-number v-model="num3" @change="handleChange" :min="0" :max="59" size="small" />
+                  小时开始，每
+                  <el-input-number v-model="num4" @change="handleChange" :min="0" :max="59" size="small" />
+                  小时执行一次
+                </el-radio>
+                <el-radio :label="4">
+                  <span>指定</span>
+                  <div style="margin: -15px 0 0 65px">
+                    <div style="display: flex; margin-bottom: 10px">
+                      <span>上午：</span>
+                      <el-checkbox-group v-model="checkList" style="flex-wrap: nowrap; margin-top: -2px">
+                        <el-checkbox label="00" />
+                        <el-checkbox v-for="index in 11" :key="index" :label="index >= 10 ? index : '0' + index" />
+                      </el-checkbox-group>
+                    </div>
+                    <div style="display: flex">
+                      <span>下午：</span>
+                      <el-checkbox-group v-model="checkList" style="flex-wrap: nowrap; margin-top: -2px">
+                        <el-checkbox v-for="index in numberList" :key="index" :label="index" />
+                      </el-checkbox-group>
+                    </div>
+                  </div>
+                </el-radio>
+              </el-radio-group>
+            </div>
+          </el-tab-pane>
+          <el-tab-pane label="日">
+            <div class="tabToggole">
+              <el-radio-group v-model="radio1">
+                <el-radio :label="1">每日 允许的通配符[，—*/]</el-radio>
+                <el-radio :label="2">不指定</el-radio>
+                <el-radio :label="3">周期从
+                  <el-input-number v-model="num1" @change="handleChange" :min="0" :max="59" size="small" />
+                  至
+                  <el-input-number v-model="num2" @change="handleChange" :min="0" :max="59" size="small" />
+                  日
+                </el-radio>
+                <el-radio :label="4">从
+                  <el-input-number v-model="num3" @change="handleChange" :min="0" :max="59" size="small" />
+                  日开始，每
+                  <el-input-number v-model="num4" @change="handleChange" :min="0" :max="59" size="small" />
+                  日执行一次
+                </el-radio>
+                <el-radio :label="5">每月
+                  <el-input-number v-model="num5" @change="handleChange" :min="0" :max="59" size="small" />
+                  号最近的那个工作日
+                </el-radio>
+                <el-radio :label="6">本月最后一天</el-radio>
+                <el-radio :label="7">
+                  <span>指定</span>
+                  <div style="margin: 12px 0 0 24px">
+                    <el-checkbox-group v-model="checkList">
+                      <el-checkbox v-for="index in 31" :key="index" :label="index >= 10 ? index : '0' + index" />
+                    </el-checkbox-group>
+                  </div>
+                </el-radio>
+              </el-radio-group>
+            </div>
+          </el-tab-pane>
+          <el-tab-pane label="月">
+            <div class="tabToggole">
+              <el-radio-group v-model="radio1">
+                <el-radio :label="1">每月 允许的通配符[，—*/]</el-radio>
+                <el-radio :label="2">不指定</el-radio>
+                <el-radio :label="3">周期从
+                  <el-input-number v-model="num1" @change="handleChange" :min="0" :max="59" size="small" />
+                  至
+                  <el-input-number v-model="num2" @change="handleChange" :min="0" :max="59" size="small" />
+                  月
+                </el-radio>
+                <el-radio :label="4">周期从
+                  <el-input-number v-model="num3" @change="handleChange" :min="0" :max="59" size="small" />
+                  日开始，每
+                  <el-input-number v-model="num4" @change="handleChange" :min="0" :max="59" size="small" />月执行一次
+                </el-radio>
+                <el-radio :label="5">
+                  <span>指定</span>
+                  <div style="margin-left: 65px; margin-top: -18px">
+                    <el-checkbox-group v-model="checkList" style="flex-wrap: nowrap; margin-top: -2px">
+                      <el-checkbox v-for="index in 12" :key="index" :label="index >= 10 ? index : '0' + index" />
+                    </el-checkbox-group>
+                  </div>
+                </el-radio>
+              </el-radio-group>
+            </div>
+          </el-tab-pane>
+          <el-tab-pane label="周">
+            <div class="tabToggole">
+              <el-radio-group v-model="radio1">
+                <el-radio :label="1">每周 允许的通配符[，—*/]</el-radio>
+                <el-radio :label="2">不指定</el-radio>
+                <el-radio :label="3">周期从星期
+                  <el-input-number v-model="num1" @change="handleChange" :min="0" :max="59" size="small" />
+                  至星期
+                  <el-input-number v-model="num2" @change="handleChange" :min="0" :max="59" size="small" />
+                </el-radio>
+                <el-radio :label="4">第
+                  <el-input-number v-model="num3" @change="handleChange" :min="0" :max="59" size="small" />
+                  周的星期
+                  <el-input-number v-model="num4" @change="handleChange" :min="0" :max="59" size="small" />
+                </el-radio>
+                <el-radio :label="5">本月最后一个星期
+                  <el-input-number v-model="num6" @change="handleChange" :min="0" :max="59" size="small" />
+                </el-radio>
+                <el-radio :label="6">
+                  <span>指定</span>
+                  <div style="margin-left: 65px; margin-top: -18px">
+                    <el-checkbox-group v-model="checkList" style="flex-wrap: nowrap; margin-top: -2px">
+                      <el-checkbox v-for="index in 7" :key="index" :label="index >= 10 ? index : '0' + index" />
+                    </el-checkbox-group>
+                  </div>
+                </el-radio>
+              </el-radio-group>
+            </div>
+          </el-tab-pane>
+
+          <el-tab-pane label="年">
+            <div class="tabToggole">
+              <el-radio-group v-model="radio1">
+                <el-radio :label="1">不指定 允许的通配符[，—*/]</el-radio>
+                <el-radio :label="2">每年</el-radio>
+                <el-radio :label="3">周期从
+                  <el-input-number v-model="num1" @change="handleChange" :min="0" :max="59" size="small" />
+                  至
+                  <el-input-number v-model="num2" @change="handleChange" :min="0" :max="59" size="small" />
+                </el-radio>
+              </el-radio-group>
+            </div>
+          </el-tab-pane>
+        </el-tabs>
+        <el-form-item class="ElFormItem" label="表达式字段：" style="font-size: 14px">
+          <div class="desCode" style="display: flex">
+            <div>
+              【秒】
+              <el-input v-model="form.seconds" class="Ipt" style="width: 45px" />
+            </div>
+            <div>【分钟】
+              <el-input v-model="form.minutes" class="Ipt" />
+            </div>
+            <div>【小时】
+              <el-input v-model="form.hours" class="Ipt" />
+            </div>
+            <div>【日】
+              <el-input v-model="form.days" class="Ipt" />
+            </div>
+            <div>【周】
+              <el-input v-model="form.weeks" class="Ipt" />
+            </div>
+            <div>【月】
+              <el-input v-model="form.months" class="Ipt" />
+            </div>
+            <div>【年】
+              <el-input v-model="form.years" class="Ipt" />
+            </div>
+          </div>
+        </el-form-item>
+        <el-form-item class="ElFormItem" label="Corn表达式：">
+          <el-input v-model="form.cornExpression" style="width: 500px"></el-input>
+          <el-button style="
+            border: 1px solid #0480ff;
+            color: #0480ff;
+            margin-left: 10px;
+          ">反解析到UI</el-button>
+        </el-form-item>
+        <el-form-item label="最近五次运行时间：">
+          <div style="margin-left: 140px">
+            <div style="height: 19px; margin-bottom: 5px" v-for="index in 5" :key="index">
+              2019-09-09 12:22:00
+            </div>
+          </div>
+        </el-form-item>
+      </el-form>
+    </div>
+    <span slot="footer" class="dialog-footer">
+      <el-button type="primary" size="small" @click="implementStrategyDialogVisible = false">保 存</el-button>
+      <el-button size="small" @click="implementStrategyDialogVisible = false">返 回</el-button>
+    </span>
+  </el-dialog>
+  <!-- 新建数据采集配置弹框 -->
+  <el-dialog append-to-body="true" :close-on-click-modal="false" :visible.sync="addDataDialogVisible" width="800px"
+    class="addDataDialogClass" ref="addDataDialog">
+    <div slot="title">
+      <span class="dialogTitle">{{configTitle?'新建数据采集配置':'数据采集配置'}}</span>
+    </div>
+    <el-divider />
+    <el-form :model="addDataDialogForm" ref="addDataDialogForm" size="small" style="padding: 10px;">
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="任务名称：" :label-width="formLabelWidth">
+            <el-input v-model="addDataDialogForm.name" style=" width: 240px;" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="任务代码：" :label-width="formLabelWidth">
+            <el-input v-model="addDataDialogForm.etlTaskCode" style=" width: 240px;"
+              oninput="value=value.replace(/[^\w+$]/g,'')" :maxlength="14" />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="输出接口：" :label-width="formLabelWidth">
+            <el-select v-model="addDataDialogForm.outPutMode" placeholder="请选择" style="width: 240px;">
+              <el-option v-for="item in outputInterfaces" :key="item.value" :label="item.label" :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="接口名：" :label-width="formLabelWidth">
+            <el-input v-if="addDataDialogForm.outPutMode== '1'" v-model="addDataDialogForm.adapterInterface"
+              style=" width: 240px;" disabled />
+            <el-input v-if="addDataDialogForm.outPutMode== '2'" v-model="addDataDialogForm.platformInterface"
+              style=" width: 240px;" />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="日志获取数量：" :label-width="formLabelWidth">
+            <el-input v-model="addDataDialogForm.total" style=" width: 240px;" @input="limitInput" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="日志获取策略：" :label-width="formLabelWidth">
+            <el-select v-model="addDataDialogForm.logOrder" placeholder="请选择" style=" width: 240px;">
+              <el-option v-for="item in collectSequentials" :key="item.value" :label="item.label" :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="指定Compress：" :label-width="formLabelWidth">
+            <el-select v-model="addDataDialogForm.compressInterface" placeholder="请选择" style=" width: 240px;">
+              <el-option v-for="item in compress" :key="item.id" :label="item.ip" :value="item.ip">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="格式化BSXML：" :label-width="formLabelWidth">
+            <el-select v-model="addDataDialogForm.formateBsXml" placeholder="请选择" style=" width: 240px;">
+              <el-option v-for="item in formatBSXMLs" :key="item.value" :label="item.label" :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12" style="display: flex;">
+          <el-form-item label="解包优先级：" :label-width="formLabelWidth">
+            <el-input v-model="addDataDialogForm.decompressPriority" style=" width: 215px;"
+              oninput="value=value.replace(/[^1-9]/g,'')" />
+          </el-form-item>
+          <el-tooltip placement="bottom-start">
+            <div slot="content">前置机数据包上传优先级，等级高的优先传。<br /><br /><br />例如：优先级1比优先级2先上传</div>
+            <i class="el-icon-question packSize" />
+          </el-tooltip>
+        </el-col>
+        <el-col :span="12" style="display: flex;">
+          <el-form-item label="执行策略：" :label-width="formLabelWidth">
+            <el-select v-model="addDataDialogForm.cron" placeholder="请选择" style="width:240px;" filterable
+              :filter-method="selectFilter" @change="selectScriptExpression">
+              <el-option v-for="item in implementStrategies" :key="item.id" :label="item.description"
+                :value="item.expression">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-form-item label="上传数据库：" :label-width="formLabelWidth" style="padding-right: 20px;">
+        <div style="max-height: 122px;overflow: hidden;overflow-y: auto;border: 1px solid #D5D6D8;">
+          <div class="uplaoddatabase" v-for="(item,index) in addDataDialogForm.cdrConfig" :key="index">
+            <div class="uplaoddatabaseItem">
+              <el-select ref="selectTreesa" v-model="item.cdrCode" placeholder="请选择" popper-class="uplaodDataListClass"
+                @change="uploadDataListChange">
+                <el-option v-for="items in uploadDataListOptions" :key="items.id" :label="items.text" :value="items.id">
+                </el-option>
+              </el-select>
+            </div>
+            <!-- v-model="addDatabaseCheckList1" @change="getFirstGroup1($event,index)" -->
+            <div class="echoDatabaseCheckListClass">
+              <el-checkbox-group v-model="addDatabaseCheckListAll[index].first" @change="getFirstGroup1($event,index)">
+                <el-checkbox label="业务BSXML："></el-checkbox>
+                <el-checkbox label="模板校验" :disabled="notHasStandard"></el-checkbox>
+                <el-checkbox label="字典翻转" :disabled="notHasStandard"></el-checkbox>
+              </el-checkbox-group>
+              <el-checkbox-group v-model="addDatabaseCheckListAll[index].last" @change="getFirstGroup2($event,index)">
+                <el-checkbox label="标准BSXML："></el-checkbox>
+                <el-checkbox label="模板校验" disabled></el-checkbox>
+                <el-checkbox label="字典翻转" disabled></el-checkbox>
+              </el-checkbox-group>
+            </div>
+            <div class="uplaoddatabaseIcon">
+              <i class="el-icon-delete" @click="deleteTableData(index)" />
+            </div>
+          </div>
+        </div>
+        <div class="uplaoddatabaseBottomes" @click="addNewTable">
+          <i class="el-icon-plus" style="font-weight: 700;color: #0480ff;" />
+          <span class="addUploadData">添加</span>
+        </div>
+      </el-form-item>
+    </el-form>
+    <span slot="footer" class="dialog-footer">
+      <el-button type="primary" size="small" @click="createDataCollectTask">保 存</el-button>
+      <el-button size="small" @click="addDataDialogVisible = false">取 消</el-button>
+    </span>
+  </el-dialog>
+  <!-- 更新数据采集配置弹框 -->
+  <el-dialog append-to-body="true" :close-on-click-modal="false" :visible.sync="updateDataDialogVisible" width="800px"
+    class="updateDataDialoClass" ref="addDataDialog">
+    <div slot="title">
+      <span class="dialogTitle">更新数据采集配置</span>
+    </div>
+    <el-divider />
+    <el-form :model="updateDataDialogForm" ref="addDataDialogForm" size="small" style="padding: 10px;">
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="任务名称：" :label-width="formLabelWidth">
+            <el-input v-model="updateDataDialogForm.NAME" style=" width: 240px;" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="任务代码：" :label-width="formLabelWidth">
+            <el-input disabled v-model="updateDataDialogForm.ETLTASKCODE" style=" width: 240px;" />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="输出接口：" :label-width="formLabelWidth">
+            <el-select v-model="updateDataDialogForm.OUTPUTMODE" placeholder="请选择" style="width: 240px;"
+              @change="changeOutputMpde">
+              <el-option v-for="item in outputInterfaces" :key="item.value" :label="item.label" :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="接口名：" :label-width="formLabelWidth">
+            <el-input v-if="updateDataDialogForm.OUTPUTMODE== '1'" v-model="updateDataDialogForm.INTERFACE"
+              style=" width: 240px;" disabled />
+            <el-input v-if="updateDataDialogForm.OUTPUTMODE== '2'" v-model="updateDataDialogForm.INTERFACE"
+              style=" width: 240px;" />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="日志获取数量：" :label-width="formLabelWidth">
+            <el-input v-model="updateDataDialogForm.TOTAL" style=" width: 240px;" @input="limitInput" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="日志获取策略：" :label-width="formLabelWidth">
+            <el-select v-model="updateDataDialogForm.LOGORDER" placeholder="请选择" style=" width: 240px;">
+              <el-option v-for="item in collectSequentials" :key="item.value" :label="item.label" :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="指定Compress：" :label-width="formLabelWidth">
+            <el-select v-model="updateDataDialogForm.COMPRESSINTERFACE" placeholder="请选择" style=" width: 240px;">
+              <el-option v-for="item in compress" :key="item.id" :label="item.ip" :value="item.ip">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="格式化BSXML：" :label-width="formLabelWidth">
+            <el-select v-model="updateDataDialogForm.FORMATEBSXML" placeholder="请选择" style=" width: 240px;">
+              <el-option v-for="item in formatBSXMLs" :key="item.value" :label="item.label" :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12" style="display: flex;">
+          <el-form-item label="解包优先级：" :label-width="formLabelWidth">
+            <el-input v-model="updateDataDialogForm.DECOMPRESSPRIORITY" style=" width: 215px;" />
+          </el-form-item>
+          <el-tooltip placement="bottom-start">
+            <div slot="content">前置机数据包上传优先级，等级高的优先传。<br /><br /><br />例如：优先级1比优先级2先上传</div>
+            <i class="el-icon-question packSize" />
+          </el-tooltip>
+        </el-col>
+        <el-col :span="12" style="display: flex;">
+          <el-form-item label="执行策略：" :label-width="formLabelWidth">
+            <el-select v-model="updateDataDialogForm.CRON" placeholder="请选择" style="width:240px;" filterable
+              :filter-method="selectFilter" @change="selectScriptExpression">
+              <el-option v-for="item in implementStrategies" :key="item.id" :label="item.description"
+                :value="item.expression">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+      </el-row>
+
+      <el-form-item label="上传数据库：" :label-width="formLabelWidth" style="padding-right: 20px;">
+        <div style="max-height: 122px;overflow: hidden;overflow-y: auto;border: 1px solid #D5D6D8;">
+          <div class="uplaoddatabase" v-for="(item,index) in updateDataDialogForm.cdrConfig" :key="index">
+            <div class="uplaoddatabaseItem">
+              <el-select ref="selectTree" v-model="item.cdrCode" popper-class="uplaodDataListClass" placeholder="请选择">
+                <el-option v-for="item in uploadDataListOptions" :key="item.id" :label="item.text" :value="item.id">
+                </el-option>
+              </el-select>
+            </div>
+            <!-- class="uplaoddatabaseGroup" -->
+            <div class="echoDatabaseCheckListClass">
+              <!-- addDatabaseCheckListAll echoDatabaseCheckList1-->
+              <el-checkbox-group v-model="updateDatabaseCheckListAll[index].first"
+                @change="getFirstGroup3($event,index)">
+                <el-checkbox label="业务BSXML："></el-checkbox>
+                <el-checkbox label="模板校验" :disabled="hasNoEchoStandard"></el-checkbox>
+                <el-checkbox label="字典翻转" :disabled="hasNoEchoStandard"></el-checkbox>
+              </el-checkbox-group>
+              <el-checkbox-group v-model="updateDatabaseCheckListAll[index].last"
+                @change="getFirstGroup4($event,index)">
+                <el-checkbox label="标准BSXML："></el-checkbox>
+                <el-checkbox label="模板校验" disabled></el-checkbox>
+                <el-checkbox label="字典翻转" disabled></el-checkbox>
+              </el-checkbox-group>
+            </div>
+            <div class="uplaoddatabaseIcon">
+              <i class="el-icon-delete" @click="deleteTableData(index)" />
+            </div>
+          </div>
+        </div>
+        <div class="uplaoddatabaseBottomes" @click="addNewTable">
+          <i class="el-icon-plus" style="font-weight: 700;color: #0480ff;" />
+          <span class="addUploadData">添加</span>
+        </div>
+      </el-form-item>
+    </el-form>
+    <span slot="footer" class="dialog-footer">
+      <el-button type="primary" size="small" @click="updateDataCollectTask">保 存</el-button>
+      <el-button size="small" @click="updateDataDialogVisible = false">取 消</el-button>
+    </span>
+  </el-dialog>
+  <!-- 新建数据采集脚本配置 --测试弹框 -->
+  <el-dialog class="dataCollectTestDialogForm" append-to-body="true" append-to-body="true" :close-on-click-modal="false"
+    :visible.sync="dataCollectTestDialogVisible" width="360px" @close="resetValid" ref="dataCollectTestDialog">
+    <div slot="title">
+      <span class="dialogTitle">数据采集测试</span>
+    </div>
+    <el-divider />
+    <el-form :model="dataCollectTestDialogForm" :rules="dataCollectTestRules" ref="dataCollectTestDialogForms"
+      size="small" label-width="140px" style="padding-top: 20px;">
+      <el-form-item label="指定SourceId：" prop="appointSourceId">
+        <el-input v-model="dataCollectTestDialogForm.appointSourceId" style="width: 205px;"
+          oninput="value=value.replace(/[^\w_]/g,'')" />
+      </el-form-item>
+      <el-form-item label="记录时间：" prop="recordTime">
+        <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" format="yyyy-MM-dd HH:mm:ss" style="width: 205px;"
+          v-model="dataCollectTestDialogForm.recordTime" type="datetime" placeholder="请选择日期">
+        </el-date-picker>
+      </el-form-item>
+      <el-form-item>
+        <el-checkbox v-model="dataCollectTestDialogForm.ifUpLoad">上传</el-checkbox>
+      </el-form-item>
+    </el-form>
+    <span slot="footer" class="dialog-footer">
+      <el-button type="primary" size="small" @click="dataCollectTest">确 认</el-button>
+      <el-button size="small" @click="resetValid ">取 消</el-button>
+    </span>
+  </el-dialog>
+
+  <!--编辑采集策略弹框   -->
+  <el-dialog append-to-body="true" :close-on-click-modal="false" :visible.sync="editCollectDialogVisible" width="360px"
+    ref="editCollectDialog">
+    <div slot="title">
+      <span class="dialogTitle">编辑采集策略</span>
+    </div>
+    <el-divider />
+    <el-form :model="editCollectDialogForm" ref="editCollectDialogForm" size="small" style="padding-top: 20px;">
+      <el-row>
+        <el-col style="display: flex;">
+          <el-form-item label="策略名称：" label-width="100px">
+            <el-select v-model="editCollectDialogForm.strategyName" placeholder="请选择" style="width:193px;">
+              <el-option v-for="item in strategyNames" :key="item.value" :label="item.label" :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <div class="addLogIcon">
+            <i class="el-icon-edit-outline" style="margin-left: 8px;" />
+            <i class="el-icon-circle-plus-outline" />
+          </div>
+        </el-col>
+      </el-row>
+    </el-form>
+    <span slot="footer" class="dialog-footer">
+      <el-button type="primary" size="small" @click="editCollectDialogVisible = false">确 认</el-button>
+      <el-button size="small" @click="editCollectDialogVisible = false">取 消</el-button>
+    </span>
+  </el-dialog>
+  <!-- 复制弹框 -->
+  <el-dialog append-to-body="true" :close-on-click-modal="false" :visible.sync="copyDialogVisible" width="360px"
+    ref="copyDialog" class="copyDialogVisibleForm">
+    <div slot="title">
+      <span class="dialogTitle">复制</span>
+    </div>
+    <el-divider />
+    <el-form :model="copyDialogVisibleForm" ref="copyDialogVisibleForm" size="small" style="padding-top: 20px;"
+      label-width="100px">
+      <el-form-item label="任务名称：" prop="taskName">
+        <el-input v-model="copyDialogVisibleForm.taskName" style="width: 243px;" />
+      </el-form-item>
+      <el-form-item label="任务代码：" prop="taskCode">
+        <el-input v-model="copyDialogVisibleForm.taskCode" style="width: 243px;" />
+      </el-form-item>
+      <el-form-item label="复制内容：" prop="copyContent">
+        <el-checkbox v-model="copyDialogVisibleForm.copyLog">日志采集</el-checkbox>
+        <el-checkbox v-model="copyDialogVisibleForm.copyData">数据采集</el-checkbox>
+      </el-form-item>
+    </el-form>
+    <span slot="footer" class="dialog-footer">
+      <el-button type="primary" size="small" @click="copyLogOrData">确 认</el-button>
+      <el-button size="small" @click="copyDialogVisible = false">取 消</el-button>
+    </span>
+  </el-dialog>
+  <!-- 提示弹框 -->
+  <el-dialog append-to-body="true" :close-on-click-modal="false" :visible.sync="tipsDialogVisible" width="320px">
+    <div slot="title">
+    </div>
+    <div class="tips">
+      <div class="tipsTitle">
+        <i class="el-icon-warning tipsIcon" />
+        <span style="margin-left: 10px;">提示</span>
+      </div>
+      <span class="tipsMessage">确认删除该任务？</span>
+    </div>
+    <span slot="footer" class="dialog-footer">
+      <!-- @click="deleteLogCollect" -->
+      <el-button type="primary" size="small" @click="deleteDataCollectTasks">确 认</el-button>
+      <el-button size="small" @click="tipsDialogVisible = false">取 消</el-button>
+    </span>
+  </el-dialog>
+  <!-- 新建触发器配置-接口模式/MQ队列弹框- -->
+  <el-dialog append-to-body="true" :close-on-click-modal="false" :visible.sync="addTriggerDialogVisible" width="800px"
+    ref="addTriggerDialog">
+    <div slot="title">
+      <span class="dialogTitle">新建触发器配置</span>
+    </div>
+    <el-divider />
+    <el-form :model="addTriggerForm" ref="addTriggerForm" size="small" style="padding: 10px;">
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="任务名称：" :label-width="formLabelWidth">
+            <el-input v-model="addTriggerForm.taskName" style=" width: 240px;" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="任务代码：" :label-width="formLabelWidth">
+            <el-input v-model="addTriggerForm.taskCode" style=" width: 240px;" />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="数据源：" :label-width="formLabelWidth">
+            <el-select v-model="addTriggerForm.dataOrigin" placeholder="请选择" style=" width: 240px;">
+              <el-option v-for="item in triggerDataOrigin" :key="item.value" :label="item.label" :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="触发对象：" :label-width="formLabelWidth">
+            <el-select v-model="addTriggerForm.triggerObject" placeholder="请选择" style=" width: 240px;">
+              <el-option v-for="item in triggerObjects" :key="item.value" :label="item.label" :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="SOURCEID：" :label-width="formLabelWidth">
+            <el-select v-model="addTriggerForm.triggerSourceId" placeholder="请选择" style="width: 240px;">
+              <el-option v-for="item in triggerSourceIds" :key="item.value" :label="item.label" :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="监听字段：" :label-width="formLabelWidth">
+            <el-select v-model="addTriggerForm.watchField" multiple filterable placeholder="请选择" style="width: 240px;">
+              <el-option v-for="item in watchFields" :key="item.value" :label="item.label" :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="业务时间：" :label-width="formLabelWidth">
+            <el-select v-model="addTriggerForm.businessTime" placeholder="请选择" style=" width: 240px;">
+              <el-option v-for="item in businessTimes" :key="item.value" :label="item.label" :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="触发事件：" :label-width="formLabelWidth">
+            <el-select v-model="addTriggerForm.triggerEvent" multiple placeholder="请选择" style="width: 240px;"
+              @change="changeSelect" @visible-change="visibleSelect">
+              <el-option v-for="item in triggerEvents" :key="item.value" :label="item.label" :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="触发操作：" :label-width="formLabelWidth">
+            <el-radio-group v-model="addTriggerForm.triggerRadio" class="radioGroup" @change="triggerChange">
+              <el-radio :label="1">接口模式</el-radio>
+              <el-radio :label="2">MQ队列</el-radio>
+            </el-radio-group>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <div style="background: #F5F5F5;margin: 0 20px 0 30px;padding: 10px 0 5px;">
+        <el-form-item :class="{'labelStyle': labelClass}" label="地址：" label-width="100px" style="margin-bottom: 10px;">
+          <el-input v-model="addTriggerForm.address" placeholder="请输入地址" style="width: 400px;" />
+        </el-form-item>
+        <el-form-item v-if="addTriggerForm.triggerRadio===1" label="接口类型：" label-width="100px"
+          style="margin-bottom: 10px;">
+          <el-select v-model="addTriggerForm.interfaceType" placeholder="请输入接口类型" style="width: 160px;">
+            <el-option v-for="item in interfaceTypes" :key="item.value" :label="item.label" :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item v-if="addTriggerForm.triggerRadio===1" label="接入名：" label-width="100px"
+          style="margin-bottom: 0px;">
+          <el-input v-model="addTriggerForm.accessName" placeholder="请输入接入名" style="width: 400px;" />
+        </el-form-item>
+      </div>
+      <el-form-item label="上传jar包：" :label-width="formLabelWidth" style="margin-top: 20px;">
+        <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/" :on-preview="handlePreview"
+          :on-remove="handleRemove" multiple :limit="3" :file-list="fileList">
+          <el-button size="medium" type="default"><i class="el-icon-upload2" style="margin-right: 5px" />点击上传
+          </el-button>
+        </el-upload>
+      </el-form-item>
+    </el-form>
+    <span slot="footer" class="dialog-footer">
+      <el-button type="primary" size="small" @click="addTriggerDialogVisible = false">保 存</el-button>
+      <el-button size="small" @click="addTriggerDialogVisible = false">取 消</el-button>
+    </span>
+  </el-dialog>
+
+  <!-- 数据采集管理--展开弹框  -->
+  <el-container v-if="!medicalRecord" style="background-color:#fff ;height: 100%;width: 100%;">
+    <div style="display: flex;flex-direction: column;height: 100%;width: 100%;">
+      <!-- 展开/收起按钮 -->
+      <div class="expansionOrCollapse" @click="handleClick">
+        <div v-if="isShow" class="expansionOrCollapseDiv">
+          <span>展开</span>
+          <i class="el-icon-arrow-down">
+        </div>
+        <div v-if="!isShow" class="expansionOrCollapseDiv">
+          <span>收起</span>
+          <i class="el-icon-arrow-up">
+        </div>
+      </div>
+      <!-- 流程图 -->
+      <div
+        style="position: relative;display: flex;justify-content: space-between;padding: 0 8px 10px 15px;height: calc(100% - 72px);width: 100%;overflow: auto;">
+        <!-- 第一列 -->
+        <div style="display: flex;flex-direction: column;justify-content: space-between;">
+          <div v-for="(item,index) in bigServerData.business"
+            style="width: 120px;height: 105px;margin-bottom: 66px;position: relative;">
+            <img :id="'picsOne'+index" style="width: 100%; height: 100%"
+              src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/1.png" alt="" />
+            <span style="
+            position: absolute;
+            top: 49%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        ">{{item.name}}</span>
+          </div>
+        </div>
+        <!-- 第二列 -->
+        <div style="
+          display: flex;
+          flex-direction: column;
+          justify-content: space-around;
+        ">
+          <div v-for="(item,index) in bigServerData.logCollect" style="
+            position: relative;
+            width: 68px;
+            height: 116px;
+            margin-bottom: 40px;
+          ">
+            <span style="font-size: 14px; margin-left: 10px">日志采集</span>
+            <img :id="'picsTwo'+index" @click="getLogScript" style="width: 65px; height: 60px; margin-top: 10px"
+              src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/2.png" alt="" />
+            <span style="font-size: 14px; margin-left: 5px">{{item.ip}}</span>
+          </div>
+        </div>
+        <!-- 第三列 -->
+        <div style="display: flex;flex-direction: column;justify-content: center;">
+          <div @click="getLogLibrary" style="
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 120px;
+            height: 105px;
+            margin-bottom: 33px;
+          ">
+            <img id="picsThree" style="width: 100%; height: 100%"
+              src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/1.png" alt="" />
+            <span style="
+              position: absolute;
+              top: 0;
+              left: 50%;
+              transform: translate(-50%, 180%);
+            ">日志库</span>
+
+            <div style="display: flex; font-size: 14px; color: #333">
+              <span style="color: #ff3034">{{totalErrorCounts}}</span>
+              <span>/</span>
+              <span>{{totalCounts}}</span>
+            </div>
+          </div>
+        </div>
+        <!-- 第四列 -->
+        <div style="
+          display: flex;
+          flex-direction: column;
+          justify-content: space-around;
+        ">
+          <div v-for="(item,index) in bigServerData.compress" style="
+          position: relative;
+          width: 68px;
+          height: 116px;
+          margin-bottom: 40px;
+        ">
+            <span style="font-size: 14px; margin-left: 10px">数据采集</span>
+            <img :id="'picsFour'+index" @click="getDataScript" style="width: 65px; height: 60px; margin-top: 10px"
+              src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/2.png" alt="" />
+            <span style="font-size: 14px; margin-left: 5px">{{item.ip}}</span>
+          </div>
+        </div>
+        <!-- 第五列 -->
+        <div style="
+          display: flex;
+          flex-direction: column;
+          justify-content: space-around;
+        ">
+          <div v-for="(item,index) in bigServerData.adapter" style="
+          position: relative;
+          width: 68px;
+          height: 116px;
+          margin-bottom: 40px;
+        ">
+            <span style="font-size: 14px; margin-left: 10px">前置机</span>
+            <img :id="'picsFive'+index" style="width: 65px; height: 60px; margin-top: 10px"
+              src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/2.png" alt="" />
+            <span style="font-size: 14px; margin-left: 5px">{{item.ip}}</span>
+          </div>
+
+        </div>
+        <!-- 第六列 -->
+        <div style="display: flex;flex-direction: column;justify-content: center; margin-right: -8%">
+          <div @click="queryFrontLibraryList" style="
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 120px;
+            height: 105px;
+            margin-bottom: 33px;
+          ">
+            <img id="picsSix" style="width: 100%; height: 100%"
+              src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/1.png" alt="" />
+            <span style="
+              position: absolute;
+              top: 0;
+              left: 50%;
+              transform: translate(-50%, 180%);
+            ">前置机库</span>
+            <div style="display: flex; font-size: 14px; color: #333">
+              <span style="color: #ff3034">{{qianzhijiErrorTotal}}</span>
+              <span>/</span>
+              <span>{{qianzhijiTotal}}</span>
+            </div>
+            <!-- <div
+            style="
+              position: absolute;
+              top: 60%;
+              left: -136%;
+              width: 163px;
+              height: 1px;
+              background-color: #4088fe;
+            "
+          />
+          <div
+            style="
+              position: absolute;
+              top: 60%;
+              left: 94%;
+              width: 60px;
+              height: 1px;
+              background-color: #4088fe;
+            "
+          /> -->
+          </div>
+        </div>
+        <!-- 第七列 -->
+        <div style="display: flex;
+        flex-direction: column;
+        justify-content: space-around;">
+          <div v-for="(item,index) in bigServerData.decompress" style="
+        position: relative;
+        width: 68px;
+        height: 116px;
+        margin-bottom: 40px;
+      ">
+            <span style="font-size: 14px; margin-left: 24px">解包</span>
+            <img :id="'picsSeven'+index" @click="getDataScript" style="width: 65px; height: 60px; margin-top: 10px"
+              src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/2.png" alt="" />
+            <span style="font-size: 14px; margin-left: 5px">{{item.ip}}</span>
+            <span v-if="item.decompressMainTable" style="
+          position: absolute;
+          top: 14%;
+          right: -70%;
+          font-size: 12px;
+          color: #4088fe;
+        ">正在处理</span>
+            <span v-if="item.decompressMainTable"
+              style="position: absolute; top: 28%; right: -76%; font-size: 12px">{{item.decompressMainTable}}</span>
+
+          </div>
+        </div>
+        <!-- 第八列 -->
+        <div style="
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+        ">
+          <div v-for="(item,index) in bigServerData.cdr" v-if="item.CDRNAME&&item.CDRCODE"
+            @click="getCdrData(item.CDRCODE,item.CDRNAME)" style="
+            position: relative;
+            width: 125px;
+            height: 107px;
+            margin-bottom: 33px;
+            cursor: pointer;
+          ">
+            <img :id="'picsEight'+index" style="width: 100%; height: 100%"
+              src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/1.png" alt="" />
+            <span style="
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+            ">{{item.CDRNAME}}</span>
+          </div>
+
+        </div>
+      </div>
+      <!-- 底部 -->
+      <div class="mainFooter">
+        <el-footer>
+          <div style="margin-right: 40px;">
+            <span><i>日志采集任务总数</i> {{logTotal.total}}个,</span>
+            <span><i style="color: #26BF40;">启动</i>： {{logTotal.start}}个，</span>
+            <span><i style="color: #FF3034;">停止</i>： {{logTotal.stop}}个，</span>
+            <span><i style="color: #FF9A26;">暂停</i>： {{logTotal.pause}}个，</span>
+          </div>
+          <div>
+            <span><i>数据集任务总数</i>: {{dataTotal.total}}个,</span>
+            <span><i style="color: #26BF40;">启动</i>： {{dataTotal.start}}个，</span>
+            <span><i style="color: #FF3034;">停止</i>： {{dataTotal.stop}}个，</span>
+            <span><i style="color: #FF9A26;">暂停</i>： {{dataTotal.pause}}个，</span>
+          </div>
+        </el-footer>
+      </div>
+    </div>
+  </el-container>
+  <!-- 数据采集管理--数据采集监控弹框  -->
+  <el-dialog append-to-body="true" :close-on-click-modal="false" :visible.sync="dataCollectDialogVisible" width="820px"
+    ref="dataCollectDialog" @close="closeDataCollect" class="dataCollectDialog">
+    <div slot="title">
+      <span class="dialogTitle">数据采集监控</span>
+    </div>
+    <el-divider />
+    <el-tabs v-model="activeName" type="card" style="margin: 12px 24px 0 24px;">
+      <el-tab-pane label="采集趋势" name="1">
+        <el-form :inline="true" :model="collectMonitorForm" size="small" style="color: #333;">
+          <el-form-item style="margin-right: 0;">
+            <div class="dataCollectStyle">
+              <el-radio-group v-model="collectMonitorForm.collectMonitorRadio" @change="selectTimeToEcharts">
+                <el-radio :label="1">今日</el-radio>
+                <el-radio :label="2">昨日</el-radio>
+                <el-radio :label="3">一周</el-radio>
+                <el-radio :label="4">自定义</el-radio>
+              </el-radio-group>
+            </div>
+          </el-form-item>
+          <el-form-item style="height: 32px;">
+            <el-date-picker :clearable="false" :editable="false"
+              :disabled="collectMonitorForm.collectMonitorRadio !== 4" class="ownDatePicker" v-model="defineTimes"
+              type="daterange" value-format="yyyy-MM-dd HH:mm:ss" format="yyyy-MM-dd" range-separator="至"
+              :picker-options="pickerOptions" start-placeholder="开始日期" end-placeholder="结束日期" @change="changeTiemes">
+            </el-date-picker>
+            <!-- <el-date-picker
+              :clearable="false"
+              :editable="false"
+              :disabled="collectMonitorForm.collectMonitorRadio !== 4"
+              class="ownDatePicker"
+              value-format="yyyy-MM-dd HH:mm:ss"
+              format="yyyy-MM-dd"
+              style="width: 175px;"
+              v-model="collectMonitorForm.defineTimes1"
+              type="datetime"
+              :picker-options="pickerOptions"
+              placeholder="选择日期">
+            </el-date-picker>
+            <span style="padding: 0 5px;">至</span>
+            <el-date-picker
+              :clearable="false"
+              :editable="false"
+              :disabled="collectMonitorForm.collectMonitorRadio !== 4"
+              class="ownDatePicker"
+              style="width: 175px;"
+              v-model="collectMonitorForm.defineTimes2"
+              value-format="yyyy-MM-dd HH:mm:ss"
+              format="yyyy-MM-dd"
+              type="datetime"
+              :picker-options="pickerOptions"
+              placeholder="选择日期">
+            </el-date-picker> -->
+          </el-form-item>
+          <el-form-item style="margin-right: 0;margin-left: 1px;">
+            <el-button type="primary" @click="searchQuery">查询</el-button>
+          </el-form-item>
+        </el-form>
+        <div class="echartsShow">
+          <span class="trendStyle">服务调用趋势</span>
+          <!-- echarts图 "width:100%;height:calc(100% - 36px);-->
+          <div id="serviceTrendEcharts" style="width:100%;height:calc(100% - 36px);margin-top: 15px;"></div>
+        </div>
+      </el-tab-pane>
+      <el-tab-pane label="控制台" name="2">
+        <el-form :inline="true" :model="collectControlMonitorForm" size="small" style="color: #333;">
+          <el-form-item label="服务器：">
+            <el-select v-model="collectControlMonitorForm.serviceAddress" placeholder="请选择" style="width: 170px;"
+              @change="selectChange" value-key="value">
+              <el-option v-for="item in serviceAddress" :key="item.value" :label="item.label" :value="item">
+              </el-option>
+            </el-select>
+
+          </el-form-item>
+          <el-form-item style="margin-right: 0px;margin-left: 294px;">
+            <el-button @click="stopDataCollect" v-if="controllerBtnFlag">暂 停</el-button>
+            <el-button @click="recoverDataCollect" v-if="!controllerBtnFlag">恢 复</el-button>
+            <el-button type="primary" @click="clearControllerData">清 空</el-button>
+          </el-form-item>
+        </el-form>
+        <div class="controlStyle">
+          <ul>
+            <li v-for="(item,index) in controllTaskes" v-if="controllTaskes.length>0"
+              style="display:flex ;justify-content: space-between;">
+              <span>任务：{{controllTaskes[index][1]}}</span>
+              <span style="color: #999999;margin: 0px 44px 0px 35px;">
+                <span>{{controllTaskes[index][0]}}</span>
+              </span>
+            </li>
+          </ul>
+        </div>
+      </el-tab-pane>
+    </el-tabs>
+  </el-dialog>
+  <!-- 数据采集管理--日志库弹框  -->
+  <el-dialog append-to-body="true" :close-on-click-modal="false" :visible.sync="logLibraryDialogVisible" width="895px"
+    ref="logLibraryDialog" @close="getLogCollectQueryList">
+    <div slot="title">
+      <span class="dialogTitle">日志库</span>
+    </div>
+    <el-divider />
+    <el-form :inline="true" :model="logLibraryForm" ref="logLibraryForm" class="logLibraryForm" size="small">
+      <el-form-item label="机构名称：" style="margin-top: -5px;">
+        <el-select class="searchKeys" v-model="logLibraryForm.organizations" placeholder="请选择" size="small"
+          @change="changeOrganization">
+          <el-option v-for="item in organizationOptions" :key="item.id" :label="item.orgName" :value="item.orgCode" />
+        </el-select>
+        <!-- <el-input v-model="logLibraryForm.organizations" placeholder="机构"></el-input> -->
+      </el-form-item>
+      <el-form-item label="任务名称：" style="margin-top: -5px;">
+        <el-select class="searchKeys" v-model="logLibraryForm.taskName" placeholder="请选择" size="small"
+          @change="changeLogOrganization">
+          <el-option v-for="item in allTaskNameList" :key="item.ID"
+            :label="item.NAME+'('+item.ETLTASKCODE+')'+'    '+item.errorCount+'/'+item.totalCount"
+            :value="item.LOGTABLENAME" />
+        </el-select>
+        <!-- <el-input v-model="logLibraryForm.taskName" placeholder="请输入任务名称"></el-input> -->
+      </el-form-item>
+      <el-form-item>
+        <el-button class="logLibraryBtn" type="primary" @click="emptyLogTableAllData">清空日志表</el-button>
+        <el-button class="logLibraryBtn" type="primary" @click="editSQLScript">编辑SQL脚本</el-button>
+      </el-form-item>
+    </el-form>
+    <div class="lgoDatabase">
+      <div class="leftLogLibrary">
+        <div class="logName">
+          <span class="logLine" />
+          <span> 日志类型</span>
+        </div>
+        <div class="logTypeStyle">
+          <div>
+            <div v-if="item.description=='待采集'" class="errorType " :class="{'errorText': index===currentIndex}"
+              style="font-weight: 700; margin-bottom: 0px !important;" v-for="(item,index) in logLibraryErrorList.list"
+              @click="clickLogType(item,index)">
+              <div class="errorTypes">
+                <span>{{item.description}}</span>
+                <!-- <span>{{item.PROCESSFLAG == '0'?item.PROCESSFLAG: '0'}}</span> -->
+              </div>
+              <span>{{item.NUM}}</span>
+            </div>
+            <!--  :class="{errorText: item.description=='待采集'}" -->
+            <div v-if="item.description!=='待采集'" class="errorType" v-for="(item,index) in logLibraryErrorList.list"
+              :class="{'errorText': index===currentIndex}" @click="clickLogType(item,index)">
+              <div class="errorTypes">
+                <el-tooltip class="item" effect="dark" :content="item.description" placement="top">
+                  <div class="shenglue">{{item.description}}</div>
+                </el-tooltip>
+
+                <span>{{item.PROCESSFLAG}}</span>
+              </div>
+              <span>{{item.NUM}}</span>
+            </div>
+          </div>
+          <div class="errorTypeFooter">
+            <div>总计：</div>
+            <div>
+              <span
+                style="color: #FF3034 ;">{{logLibraryErrorList.totalErrorCount}}</span>/<span>{{logLibraryErrorList.totalCount}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="centerLogLibrary">
+        <div
+          style="height: 40px;display: flex;justify-content: space-between;border-bottom: 1px solid #D5D6DB;background: #F9F9F9; ">
+          <div class="logName">
+            <span class="logLine" />
+            <span>日志列表</span>
+          </div>
+
+          <div class="hhh" style="line-height: 40px;margin-right: 15px;position: relative;">
+            <el-button class="logLibraryBtn" type="primary" size="small" @click="againUplodErrorLog"
+              @mouseenter.native="inDomeReUpload" @mouseleave.native="outDomeReUpload">重传
+            </el-button>
+            <el-button class="logLibraryBtn" type="primary" size="small" @click="deleteErrorLogList"
+              @mouseenter.native="inDomeDeleteAll" @mouseleave.native="outDomeDeleteAll">删除</el-button>
+            <div v-if="isReUpload" class="hoverDiv" @click="againUplodAllErrorLog">全部重传</div>
+            <div v-if="isDeleteAll" class=" hoverDiv10" @click="deleteAllErrorLogList">全部删除</div>
+          </div>
+        </div>
+        <div style="height: calc(100% - 40px);">
+          <el-table class="logListDataTable" :data="logListData" border height="calc(100% - 52px)"
+            style="width: 100%;cursor: pointer;" size="small"
+            :header-cell-style="{'background':'#EBF4FF','color':'#333'}" :highlight-current-row="true"
+            @cell-click="cellClickLogLibrary" @select="selectLogLibrary" @select-all="selectLogLibrary">
+            <el-table-column type="selection" width="40" />
+            <el-table-column show-overflow-tooltip sortable prop="EFFECTIVETIME" label="创建时间">
+            </el-table-column>
+            <el-table-column show-overflow-tooltip sortable prop="ERRORDATATIME" label="错误时间">
+            </el-table-column>
+            <el-table-column prop="SOURCEID" label="sourceId" width="82">
+            </el-table-column>
+            <el-table-column prop="PROCESSFLAG" label="错误代码" width="78">
+              <template slot-scope="{row}">
+                <span style="color: #FF3034 ;">{{row.PROCESSFLAG}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column align="center" prop="ERRORCOUNT" label="错误次数" width="80">
+            </el-table-column>
+          </el-table>
+          <div class="logLibraryPagination">
+            <el-pagination @size-change="handleSizeChangeLogLibrary" @current-change="handleCurrentChangeLogLibrary"
+              :current-page="paginationLogLibrary.currentPage" :page-sizes="[10, 20, 30, 40]" :pager-count="3"
+              :page-size="paginationLogLibrary.pageSize" layout="total, sizes, prev, pager, next"
+              :total="paginationLogLibrary.totalNum" />
+          </div>
+        </div>
+      </div>
+      <div class="rightLogLibrary">
+        <div class="logName">
+          <span class="logLine" />
+          <span>错误详情</span>
+        </div>
+        <div class="rightLogLibraryContent">
+          <!--  {{item.ERRORCONTENT}} -->
+          <div style="margin-bottom: 10px;">
+            {{errorDetail}}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="logLibraryTip">注：重传指再次用sourceId去执行数据采集，会清空错误信息。</div>
+  </el-dialog>
+  <!-- 数据采集管理--前置机库（frontLibrary）弹框  -->
+  <el-dialog append-to-body="true" :close-on-click-modal="false" :visible.sync="frontLibraryDialogVisible"
+    width="1000px" ref="frontLibraryDialog">
+    <div slot="title">
+      <span class="dialogTitle">前置机库</span>
+    </div>
+    <el-divider />
+    <div class="lgoDatabase" style="border: 0 !important;margin: 10px 24px 10px 26px;">
+      <div class="leftLogLibrary" style="border: 1px solid #D5D6DB;width: 200px;">
+        <div
+          style="display: flex;justify-content: space-between;background: #EBF4FF;height: 40px;line-height: 36px;font-size: 16px;color: #333333;font-family: MicrosoftYaHei;padding: 0 9px;border-bottom: 1px solid #D5D6DB;">
+          <span>表名</span>
+          <span>数量</span>
+        </div>
+        <div class="logTypeStyle">
+          <div style="cursor: pointer;">
+            <div class="errorType" :class="{'errorFrontText': index===currentFrontIndex}"
+              v-for="(item,index) in frontLibraryList.data" v-if="item.mainTable=='SYS_DATATABLE_ERROR_MAIN'"
+              @click="FrontLibraryDataListHandle(item,index)">
+              <span>错误表</span>
+              <span>{{item.errorTotal}}</span>
+            </div>
+            <div class="errorType" :class="{'errorFrontText': index===currentFrontIndex}"
+              v-for="(item,index) in frontLibraryList.data" @click="FrontLibraryDataListHandle(item,index)"
+              v-if="item.mainTable!=='SYS_DATATABLE_ERROR_MAIN'">
+              <span v-if="item.mainTable!=='SYS_DATATABLE_ERROR_MAIN'">{{item.mainTable}}</span>
+              <span v-if="item.mainTable!=='SYS_DATATABLE_ERROR_MAIN'">{{item.realTotal}}</span>
+            </div>
+          </div>
+          <div style="display: flex;justify-content: end;padding: 0 8px 6px 8px;">
+            <div>总计：</div>
+            <div>
+              <span
+                style="color: #FF3034 ;">{{frontLibraryList.errorTotal}}</span>/<span>{{frontLibraryList.total}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="centerLogLibrary" style="margin: 0 10px;border: 1px solid #D5D6DB;width: calc(100% - 380px);">
+        <div
+          style="height: 40px;display: flex;justify-content: space-between;border-bottom: 1px solid #D5D6DB;background: #F9F9F9; ">
+          <el-form style="padding: 5px 0 0 5px;" :inline="true" :model="frontLibraryForm" ref="frontLibraryForm"
+            size="small">
+            <el-form-item label="错误代码：" v-if="currentFrontIndex == 0">
+              <el-select v-model="frontLibraryForm.errorField" placeholder="请选择" @change="selectErrorCode">
+                <el-option v-for="item in frontLibraryOption" :key="item.PROCESSFLAG"
+                  :label="item.NAME+'('+item.PROCESSFLAG+')'+'-'+item.TOTAL" :value="item.PROCESSFLAG">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-form>
+          <div class="qianzhiji" style="position: relative;line-height: 40px;margin-right: 10px;">
+            <!-- 重采 -->
+            <el-button class="logLibraryBtn" type="primary" size="small" @mouseenter.native="inDomeQianzhijiCollect"
+              @mouseleave.native="outDomeQianzhijiCollect" @click="reCollectFrontLibraryList(0)"
+              :disabled="btnDisabledFlag">重采</el-button>
+            <el-button v-if="isShowAllCollect" class="logLibraryBtn logLibraryBtn1" type="primary" size="small"
+              style="position: absolute;left: 0;top: 40px;z-index: 9;width: 56px;"
+              @click="reCollectFrontLibraryList(1)">全部重采</el-button>
+            <!-- 重传 -->
+            <el-button class="logLibraryBtn" type="primary" size="small" @mouseenter.native="inDomeQianzhijiUpload"
+              @mouseleave.native="outDomeQianzhijiUpload" @click="reUploadFrontLibraryList(0)"
+              :disabled="btnDisabledFlag">重传</el-button>
+            <el-button v-if="isShowAllUpload" class="logLibraryBtn logLibraryBtn1" type="primary" size="small"
+              style="position: absolute;right: 59px;top: 40px;z-index: 9;width: 56px;"
+              @click="reUploadFrontLibraryList(1)">全部重传</el-button>
+            <!-- 删除 -->
+            <el-button class="logLibraryBtn" type="primary" size="small" @mouseenter.native="inDomePause"
+              @mouseleave.native="outDomePause" @click="deleteFrontLibraryList(0)" :disabled="btnDisabledFlag">删除
+            </el-button>
+            <el-button v-if="isShowAllDelete" class="logLibraryBtn logLibraryBtn1" type="primary" size="small"
+              style="position: absolute;right: 0;top: 40px;z-index: 9;width: 56px;" @click="deleteFrontLibraryList(1)">
+              全部删除</el-button>
+          </div>
+        </div>
+        <div style="height: calc(100% - 40px);">
+          <el-table class="logListDataTable" :data="frontListData" border height="calc(100% - 50px)" style="width: 100%"
+            size="small" :header-cell-style="{'background':'#EBF4FF','color':'#333'}" @select="selectAdapterLibrary"
+            @select-all="selectAdapterLibrary" @row-click="clickDataRow">
+            <el-table-column type="selection" width="55">
+            </el-table-column>
+            <el-table-column show-overflow-tooltip sortable prop="errorTime" :label="timeLabel">
+            </el-table-column>
+            <el-table-column prop="sourceId" label="sourceId" width="100">
+            </el-table-column>
+            <el-table-column prop="errorCode" label="错误代码" width="100">
+              <template slot-scope="{row}">
+                <span style="color: #FF3034 ;">{{row.errorCode}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column align="center" prop="errorCount" label="错误次数" width="100">
+            </el-table-column>
+          </el-table>
+          <div class="logLibraryPagination">
+            <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
+              :current-page="paginationAdapter.currentPage" :page-sizes="[10, 20, 30, 40]"
+              :page-size="paginationAdapter.pageSize" :pager-count="3" layout="total, sizes, prev, pager, next"
+              :total="paginationAdapter.totalNum" />
+          </div>
+        </div>
+      </div>
+      <div class="rightLogLibrary  rightFrontLibrary" style="border: 1px solid #D5D6DB;width: 250px;overflow: hidden;
+      overflow-y: auto;">
+        <el-tabs type="border-card" style="border: 0;height: 100%;">
+          <el-tab-pane label="BSXML">
+            <div>
+              <div>
+                {{frontLibraryDataDetail.BSXML}}
+              </div>
+            </div>
+          </el-tab-pane>
+          <el-tab-pane label="错误详情" class="rightLogLibraryContent" style="padding: 0;">
+            <!-- <div  v-for="item in frontListData" style="margin-bottom:10px ;">
+              {{frontLibraryDataDetail.ErrorData}}
+            </div> -->
+            <div style="margin-bottom:10px ;">
+              {{frontLibraryDataDetail.ErrorData}}
+            </div>
+          </el-tab-pane>
+        </el-tabs>
+      </div>
+    </div>
+    <div class="logLibraryTip">注：重传指将完整的数据包再次上传到解包程序处理，会清空错误信息；重采指用sourceId再次执行数据采集，执行时会删除前置机记录。</div>
+  </el-dialog>
+  <!-- 数据采集管理--CDR库/CDR分区统计 弹框  -->
+  <el-dialog class="CDRLibraryClass" append-to-body="true" :close-on-click-modal="false"
+    :visible.sync="CDRLibraryDialogVisible" width="780px" ref="CDRLibraryDialog">
+    <div slot="title">
+      <span class="dialogTitle">{{cdrNamese}}库</span>
+    </div>
+    <el-divider />
+    <el-tabs type="border-card" style="border: 0;height: 100%;margin-top: 10px;padding: 0 24px 30px 24px;">
+      <el-tab-pane label="分区统计">
+        <el-table v-loading="CDRPartitionLoading" :data="CDRPartitionTableData" border
+          :header-cell-style="{'background':'#EBF4FF','color':'#333'}" style="width: 100%">
+          <el-table-column show-overflow-tooltip prop="DPNAME" label="名称" width="160">
+          </el-table-column>
+          <el-table-column prop="TOTALSPACE" label="总空间(MB)" width="160">
+          </el-table-column>
+          <el-table-column prop="USEDSPACE" label="已用空间(MB)">
+          </el-table-column>
+          <el-table-column prop="FREESPACE" label="剩余空间(MB)">
+          </el-table-column>
+          <el-table-column prop="USERATIO" label="使用率(%)">
+          </el-table-column>
+        </el-table>
+      </el-tab-pane>
+      <el-tab-pane label="数据统计">
+        <el-table :data="CDRDataTableData" border :header-cell-style="{'background':'#EBF4FF','color':'#333'}"
+          style="width: 100%">
+          <el-table-column show-overflow-tooltip prop="NAME" label="数据集名称" width="160">
+          </el-table-column>
+          <el-table-column show-overflow-tooltip prop="TABLENAME" label="表名">
+          </el-table-column>
+          <el-table-column prop="count" label="总数" width="80">
+          </el-table-column>
+          <el-table-column prop="intervalTime" label="相隔时间" width="100">
+          </el-table-column>
+          <el-table-column prop="addCount" label="增长量(条)" width="100">
+          </el-table-column>
+        </el-table>
+      </el-tab-pane>
+    </el-tabs>
+  </el-dialog>
+  <!-- 数据采集管理--文档库--文档库统计分析/文档库服务监控 弹框  -->
+  <el-dialog append-to-body="true" :close-on-click-modal="false" :visible.sync="fileLibraryDialogVisible" width="1000px"
+    ref="fileLibraryDialog">
+    <div slot="title">
+      <span class="dialogTitle">文档库</span>
+    </div>
+    <el-divider />
+    <el-tabs class="fileLibraryStyle" type="border-card">
+      <el-tab-pane label="CDR分区统计">
+        <div class="fileLibraryStyleHead">
+          <el-form :inline="true" :model="fileLibraryForm" class="demo-form-inline" size="small">
+            <el-form-item label="年份：">
+              <el-date-picker v-model="fileLibraryForm.year1" type="date" style="width: 140px;" placeholder="选择日期">
+              </el-date-picker>
+              <span style="margin: 0 9px;">至</span>
+              <el-date-picker v-model="fileLibraryForm.year2" type="date" style="width: 140px;" placeholder="选择日期">
+              </el-date-picker>
+            </el-form-item>
+            <el-form-item label="文档类型：">
+              <el-select style="width: 140px;" v-model="fileLibraryForm.fileType" placeholder="活动区域">
+                <el-option label="全部" value="1"></el-option>
+                <el-option label="单个" value="2"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="searchFileLibrary">查询</el-button>
+            </el-form-item>
+          </el-form>
+          <div class="fileLibraryStyleHeadRight">
+            <i class="el-icon-refresh fileLibraryStyleHeadRightIcon" />
+            <span style="color: #333333;">数据更新于2021-08-08 16:20:00</span>
+          </div>
+        </div>
+        <div class="yearDiv">
+          <div style="margin-right: 10px;">
+            <div class="yearDataDiv">
+              <div class="yearDataDivHead">
+                <div>
+                  <span class="yearDataDivHeadSPan"></span>
+                  <span class="yearDataDivHeadYearData">年份数据统计</span>
+                </div>
+                <div>
+                  <span style="color: #666;">总计:</span>
+                  <span class="yearDataDivHeadYearData">41</span>
+                </div>
+              </div>
+              <div id="yearDataEchartStyle" style="width: 540px;height: 188px;">echarts图表</div>
+            </div>
+            <div class="fileTypeDataDiv">
+              <div class="yearDataDivHead">
+                <div>
+                  <span class="yearDataDivHeadSPan"></span>
+                  <span class="yearDataDivHeadYearData">文档类型数据统计</span>
+                </div>
+                <div style="display: none;">
+                  <span style="color: #666;">总计:</span>
+                  <span class="yearDataDivHeadYearData">41</span>
+                </div>
+              </div>
+              <div id="fileTypeDataEchartStyle" style="width: 100%;height: 100%;">
+              </div>
+            </div>
+          </div>
+          <div class="yearStatisticsTable">
+            <div class="yearDataDivHead">
+              <div>
+                <span class="yearDataDivHeadSPan"></span>
+                <span class="yearDataDivHeadYearData">年份数据统计</span>
+              </div>
+              <div>
+                <span style="color: #666;">总计:</span>
+                <span class="yearDataDivHeadYearData">41</span>
+              </div>
+            </div>
+            <div style="margin-top: 7px;">
+              <el-table :data="yearTypeDataTableData" :header-cell-style="{'background':'#EBF4FF','color':'#333'}"
+                border style="width: 100%">
+                <el-table-column label="序号" type="index" align="center" :index="indexMethod" width="50">
+                </el-table-column>
+                <el-table-column prop="fileName" label="文档名称">
+                </el-table-column>
+                <el-table-column prop="amount" label="数量" align="center" width="60">
+                </el-table-column>
+              </el-table>
+            </div>
+          </div>
+        </div>
+      </el-tab-pane>
+      <el-tab-pane label="CDR数据统计">
+        <div style="display: flex;">
+          <div class="CDRDataStatistics">
+            <div class="CDRDataStatisticsHead">
+              <span class="yearDataDivHeadSPan"></span>
+              <span class="yearDataDivHeadYearData">跟踪服务器</span>
+            </div>
+            <div class="CDRDataStatisticsBottom">
+              <div class="CDRDataStatisticsContent">
+                <div class="CDRDataStatisticsContentLeft">
+                  <img style="width: 100%;height: 100%;"
+                    src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/4.png" alt="">
+                </div>
+                <div class="CDRDataStatisticsContentRight">
+                  <span style="margin-bottom: 8px;">IP：<span style="color: #333333 ;">10.10.0.256</span></span>
+                  <span>状态：<span style="color: #3CAE5A ;">ACTIVE</span></span>
+                </div>
+              </div>
+              <div class="CDRDataStatisticsContent">
+                <div class="CDRDataStatisticsContentLeft">
+                  <img style="width: 100%;height: 100%;"
+                    src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/5.png" alt="">
+                </div>
+                <div class="CDRDataStatisticsContentRight">
+                  <span style="margin-bottom: 8px;">IP：<span style="color: #333333 ;">10.10.0.256</span></span>
+                  <span>状态：<span style="color: #FF5411;">OFFLINE</span></span>
+                </div>
+              </div>
+              <div class="CDRDataStatisticsContent">
+                <div class="CDRDataStatisticsContentLeft">
+                  <img style="width: 100%;height: 100%;"
+                    src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/4.png" alt="">
+                </div>
+                <div class="CDRDataStatisticsContentRight">
+                  <span style="margin-bottom: 8px;">IP：<span style="color: #333333 ;">10.10.0.256</span></span>
+                  <span>状态：<span style="color: #3CAE5A ;">ACTIVE</span></span>
+                </div>
+              </div>
+              <div class="CDRDataStatisticsContent">
+                <div class="CDRDataStatisticsContentLeft">
+                  <img style="width: 100%;height: 100%;"
+                    src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/4.png" alt="">
+                </div>
+                <div class="CDRDataStatisticsContentRight">
+                  <span style="margin-bottom: 8px;">IP：<span style="color: #333333 ;">10.10.0.256</span></span>
+                  <span>状态：<span style="color: #3CAE5A ;">ACTIVE</span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="storageServe">
+            <div class="storageServeHead">
+              <div>
+                <span class="yearDataDivHeadSPan"></span>
+                <span class="storageServeHeadName">存储服务器</span>
+              </div>
+              <div class="storageServeHeadRight">
+                <i class="el-icon-refresh storageServeHeadRightIcon" />
+                <span style="color: #333333;">数据更新于2021-08-08 16:20:00</span>
+              </div>
+            </div>
+            <div style="padding: 10px;">
+              <span>第一组</span>
+              <div class="storageServeBottom">
+                <div class="storageServeBottomContent" v-for="index in 4">
+                  <div style="display: flex;justify-content: space-between;    margin-bottom: 20px;">
+                    <div>
+                      <div style="font-size: 16px;color: #999999;margin-bottom: 10px;">IP：<span
+                          style="color:#333333 ;">10.10.2.123</span></div>
+                      <div style="width: 76px;height: 22px;">
+                        <img style="width: 22px;height: 22px;"
+                          src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/7.png" alt="">
+                        <span style="color: #0480FF ;">ACTIVE</span>
+                      </div>
+                    </div>
+                    <div style="width: 76px;height: 93px;">
+                      <img style="width: 100%;height: 100%;"
+                        src="resources/com/bsoft/etl_mcentre/front/dataCollectManagement/pictures/6.png" alt="">
+                    </div>
+                  </div>
+                  <div :id="'CDREchartsDiv' + index" style="width: 204px;height: 112px;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </el-tab-pane>
+    </el-tabs>
+  </el-dialog>
+  <!-- 批量修改采集策略 -->
+  <el-dialog append-to-body="true" title="批量修改采集策略" :visible.sync="isShowBatchEditScript" :close-on-click-modal="false"
+    width="450px" ref="batchEditDialog">
+    <el-form ref="batchEditDialogForms" :model="batchEditDialogForm" :rules="batchEditDialogFormRules"
+      label-width="130px">
+      <el-col style="display: flex;">
+        <el-form-item label="执行策略：" prop="cron">
+          <el-select v-model="batchEditDialogForm.cron" placeholder="请选择" style="width:200px;"
+            @change="selectScriptExpression">
+            <el-option v-for="item in implementStrategies" :key="item.id" :label="item.description"
+              :value="item.expression">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <div class="addLogIcon" style="margin-top: 5px;">
+          <!-- <i class="el-icon-edit-outline" style="margin-left: 8px;"  @click="implementStrategyClick"/>
+      <i class="el-icon-circle-plus-outline"
+      style="margin-left: 5px;"  @click="implementStrategyClick"/> -->
+        </div>
+      </el-col>
+
+    </el-form>
+    <span slot="footer" class="dialog-footer">
+      <el-button @click="isShowBatchEditScript = false">取 消</el-button>
+      <el-button style="margin-right:40px;" type="primary" @click="batchEditScript">确 认</el-button>
+    </span>
+  </el-dialog>
+  <el-dialog class="scriptTipsClass" append-to-body="true" title="提示" :close-on-click-modal="false"
+    :visible.sync="scriptTipsDialogVisible" width="400px">
+    <div style="margin-top: 20px;margin-bottom: 30px;">所选中任务中存在“启动”状态的采集任务，无法进行修改</div>
+  </el-dialog>
+  <!-- 数据采集测试弹窗 -->
+  <el-dialog class="dataCollectTestDialoges" append-to-body="true" title="测试结果" :close-on-click-modal="false"
+    :visible.sync="dataCollectTestDialogesVisible" width="600px">
+    <!-- <div id="formatBXMLId" style="margin-top: 20px;margin-bottom: 30px;">{{testInformation}}</div> -->
+    <!-- <xmp style="white-space: pre-wrap;">{{testInformation}}</xmp> -->
+    <div style="white-space: pre-wrap;">{{testInformation}}</div>
+    <span slot="footer" class="dialog-footer">
+      <el-button @click="dataCollectTestDialogesVisible = false">取 消</el-button>
+      <el-button style="margin-right:40px;" type="primary" @click="dataCollectTestDialogesVisible = false">确 认
+      </el-button>
+    </span>
+  </el-dialog>
+  <!-- 全屏弹框 -->
+  <div ref="dialogFull" v-if="!isScreenFull" style="width: 100%;">
+    <collect-config ref="childCollect" :toScriptData="toScriptData" :sonValue="sonValue" :scriptNames="scriptNames"
+      @goBackFather="goBackFather" @refreshData="refreshData"></collect-config>
+  </div>
+</el-container>

@@ -1,0 +1,793 @@
+<div class="dataCollectScriptConfigure">
+  <div class="scriptWarehouse">
+    <div class="dataCollectScript">
+      <div
+        style="
+      display: flex;
+      align-items: center;"
+      >
+        <el-form
+          size="small"
+          :inline="true"
+          :model="formInline"
+          class="demo-form-inline"
+        >
+          <el-form-item label="脚本名称：" style="margin-bottom: 0 !important;">
+            <el-input v-model="formInline.catalogName" style=" width: 160px;" />
+          </el-form-item>
+          <el-form-item label="导入脚本：" style="margin-bottom: 0 !important;">
+            <el-select
+              v-model="formInline.dataCollectScriptName"
+              placeholder="请选择"
+              style="width:200px;"
+              filterable
+              :filter-method="filterSelect"
+              @change="selectCatalogName"
+            >
+              <el-option
+                v-for="item in implementScripts"
+                :key="item.id"
+                :label="item.catalogName"
+                :value="item.id"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <!-- <el-form-item > -->
+          <!-- <el-input
+            style="width: 160px;"
+            v-model="formInline.region"
+            placeholder="审批人"
+          ></el-input>
+        </el-form-item> -->
+        </el-form>
+        <!-- <el-tooltip
+          class="item"
+          effect="dark"
+          content="sql导入"
+          placement="bottom-end"
+        >
+          <span>
+            <i
+              class="el-icon-download"
+              style="font-size: 18px;margin-top: -8px;color: #0480FF;cursor: pointer;"
+            />
+          </span>
+        </el-tooltip> -->
+        <div v-if="isScriptShow">
+          <span>请先确认是否导入该脚本！</span>
+          <el-button size="small" type="primary" @click="importScript"
+            >确认</el-button
+          >
+          <el-button size="small" @click="cancelConfirm">取消</el-button>
+        </div>
+      </div>
+      <div>
+        <el-button size="small" @click="goBackFather">返回</el-button>
+        <el-button
+          size="small"
+          type="primary"
+          @click="collectTest"
+          :disabled="isScriptShow"
+          :class="{newBtnStyle: isScriptShow}"
+          >测试</el-button
+        >
+      </div>
+    </div>
+
+    <div
+      style="width: 100%;height: calc(100% - 45px);display: flex;"
+      v-loading="rightLoad"
+    >
+      <div
+        style="padding: 10px;display: inline-block;width: 250px;height: 100%;border:1px solid #e4e4e4;box-sizing: border-box;"
+      >
+        <div class="scriptWarehouseIconGrop" style="margin-bottom: 10px;">
+          <i @click="addSql" class="el-icon-circle-plus-outline"></i>
+          <i @click="editSql" class="el-icon-edit-outline"></i>
+          <i @click="deleteSql" class="el-icon-delete"></i>
+          <i class="el-icon-top" @click="moveTreeNode('top')"></i>
+          <i class="el-icon-bottom" @click="moveTreeNode('down')"></i>
+        </div>
+        <!-- 数据采集左侧树 -->
+        <div style="height: calc(100% - 32px);overflow:auto;width: 100%">
+          <el-tree
+            node-key="id"
+            class="filter-tree"
+            :data="treeRightData"
+            :props="defaultPropsTwo"
+            :expand-on-click-node="expandOnClickNode"
+            default-expand-all
+            @node-click="rightTreeClick"
+            ref="rightTree"
+          >
+            <span class="custom-tree-node" slot-scope="{ node, data }">
+              <i
+                v-if="node.expanded==false&&data.children&&data.children.length>0"
+                class="el-icon-folder"
+                style="color: #F5AC00;font-size: 13px"
+              />
+              <i
+                v-if="node.expanded==true&&data.children&&data.children.length>0"
+                class="el-icon-folder-opened"
+                style="color: #F5AC00;font-size: 13px"
+              />
+              <span
+                v-if='data.attributes.type=="sql"'
+                style="color: red;font-weight: 700;"
+                >SQL</span
+              >
+              <span class="treeText">{{ node.label }}</span>
+            </span>
+          </el-tree>
+        </div>
+      </div>
+      <!-- 数据采集右侧部分v-if="showRightSql" -->
+      <div
+        style="display: inline-block;width: calc(100% - 265px);margin-left: 10px;height: 100%;"
+      >
+        <!-- 数据采集右侧部分头部 -->
+        <div class="sjcjHeader">
+          <div
+            style="
+            display: flex;
+            align-items: center;"
+          >
+            <el-radio-group v-model="sjcjRadio" @change="radioChang">
+              <el-radio :label="1">SQL型界面</el-radio>
+              <el-radio :label="0">非SQL型界面</el-radio>
+              <el-radio :label="2">存储过程</el-radio>
+            </el-radio-group>
+            <el-form
+              :model="ruleForm"
+              :rules="rules"
+              ref="ruleForm"
+              label-width="100px"
+              class="demo-ruleForm"
+              size="small"
+            >
+              <el-form-item
+                label="数据源："
+                prop="dataOrigin"
+                style="margin-bottom: 0 !important;"
+              >
+                <el-select
+                  ref="selectTree"
+                  v-model="ruleForm.dataOrigin"
+                  
+                  placeholder="请选择"
+                  style=" width: 120px;"
+                >
+                  <el-option
+                    :value="ruleForm.dataOrigin"
+                    :label="logDataSourceIdName"
+                    style="height:auto"
+                  >
+                    <el-tree
+                      class="selectTree"
+                      :data="dataOrigins"
+                      node-key="id"
+                      :props="defaultPropsSourceId"
+                      highlight-current
+                      @node-click="SelectSourceId"
+                    >
+                    </el-tree>
+                  </el-option>
+                </el-select>
+              </el-form-item>
+              <!-- <el-form-item
+                label="数据源："
+                prop="dataOrigin"
+                style="margin-top: 3px;"
+              >
+                <el-select
+                  v-model="ruleForm.dataOrigin"
+                  placeholder="请选择活动区域"
+                  style="width: 120px;"
+                >
+                  <el-option label="HIS库" value="1"></el-option>
+                  <el-option label="WCO库" value="2"></el-option>
+                </el-select>
+              </el-form-item> -->
+            </el-form>
+          </div>
+          <div>
+            <el-button
+              style="border: 1px solid #0480FF;color: #0480FF;"
+              @click="viewChange"
+              v-if='sjcjRadio!=2&&view=="1"'
+              size="mini"
+              >文本视图
+            </el-button>
+            <el-button
+              style="border: 1px solid #0480FF;color: #0480FF;"
+              @click="viewChange"
+              v-if='view=="2"&&sjcjRadio!=2'
+              size="mini"
+              >sql视图
+            </el-button>
+
+            <el-button
+              :disabled="isScriptShow"
+              @click="sjSave"
+              size="small"
+              type="primary"
+              :class="{newBtnStyle: isScriptShow}"
+              >保存</el-button
+            >
+          </div>
+        </div>
+        <!--  数据采集右侧部分--SQL型界面-->
+        <div v-if='sjcjRadio==1&&view=="1"' class="sjcjBox">
+          <div class="radioBoxBody">
+            <div class="radioBoxBodyLeft">SELECT</div>
+            <div class="radioBoxBodyRightss">
+              <div
+                class="radioBoxBodyRightsDome"
+                v-for="(item,key) in sqlData.fieldList"
+                :key="key"
+              >
+                <!-- <div style="width: calc(100% - 600px);display: flex;"> -->
+                <div style="display: flex;width: calc(100% - 470px);">
+                  <div
+                    @mouseenter="inDome(item)"
+                    @mouseleave="outDome(item)"
+                    class="radioBoxBodyRightsDomeTextConfigure"
+                    :title="item.fieldName"
+                  >
+                    <span v-if="item.isNeed=='1'" style="color:#F92B2C;">*</span
+                    >{{item.fieldName}}:
+                  </div>
+
+                  <div class="radioBoxBodyRightsDomeInputConfigure">
+                    <el-input
+                      autosize
+                      type="textarea"
+                      v-if="item.type=='textarea'"
+                      v-model="item.fieldValue"
+                      :ref="item.fieldId"
+                      size="mini"
+                    />
+                    <el-input
+                      v-model="item.fieldValue"
+                      :ref="item.fieldId"
+                      v-else
+                      @focus="inputFocus(item)"
+                      size="mini"
+                    />
+                  </div>
+                </div>
+
+                <div
+                  class="otherConfig"
+                  style="width: 500px;display: flex;align-items: center;position: absolute;right: 90px;top: 50%;transform: translateY(-50%);height: 100%"
+                >
+                  <div
+                    class="radioBoxBodyRightsDomeDeleteConfigure"
+                    v-if="item.isTransient=='1'"
+                    style="cursor: pointer;"
+                  >
+                    <i
+                    style="margin-left: 100px;"
+                      @click="editLSField(item)"
+                      class="el-icon-edit-outline"
+                    />
+                    <i @click="deleteLSField(item)" class="el-icon-delete" />
+                  </div>
+                  <div
+                    v-if="item.dicId"
+                    style="display: flex;align-items: center;position: absolute;right: 0px;top: 50%;transform: translateY(-50%);width: 400px"
+                  >
+                    <div>
+                      <el-select
+                        v-model="item.buess"
+                        size="mini"
+                        style="width: 105px;margin-right: 5px;"
+                        @change="changeDomain($event,key)"
+                      >
+                      <!-- style="width: 120px;margin-right: 10px;" -->
+                        <el-option
+                          v-for="(item,key) in domeSelectThree"
+                          :key="key"
+                          :label="item"
+                          :value="item"
+                        >
+                        </el-option>
+                      </el-select>
+                    </div>
+                    <div>
+                      <el-select
+                        v-model="item.ver"
+                        size="mini"
+                        style="width: 105px;margin-right: 5px;"
+                        @change="selectVersion($event,key)"
+                      >
+                      <!-- style="width: 120px;margin-right: 10px;" -->
+                        <el-option
+                          v-for="(item,index) in domeSelectFour[key]"
+                          :key="index"
+                          :label="item.value"
+                          :value="item.code"
+                        >
+                        </el-option>
+                      </el-select>
+                    </div>
+                    <span>{{item.dicId}}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="radioBoxBodyRightsDome">
+                <div
+                  style="height: 28px;line-height: 28px;cursor: pointer;margin-left: 20px;"
+                >
+                  <i
+                    v-if="!isScriptShow"
+                    class="el-icon-plus"
+                    style="font-weight: 700;"
+                    @click="addLSField"
+                  />
+
+                  <el-button
+                    :disabled="isScriptShow"
+                    @click="addLSField"
+                    size="small"
+                    type="primary"
+                    :class="{newBtnStyle: isScriptShow}"
+                    >添加临时字段</el-button
+                  >
+                  <!-- <span
+                    disabled
+                    style="color: #0480FF;font-size: 14px;margin-left: 5px;"
+                    >添加临时字段</span
+                  > -->
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="radioBoxBody radioBoxBodys">
+            <div class="radioBoxBodyLeft">FROM</div>
+            <div class="radioBoxBodyRight">
+              <el-input type="textarea" resize="none" v-model="sqlData.sqlFrom">
+              </el-input>
+            </div>
+          </div>
+          <div class="radioBoxBody radioBoxBodys">
+            <div class="radioBoxBodyLeft">WHERE</div>
+            <div class="radioBoxBodyRight">
+              <el-input
+                type="textarea"
+                resize="none"
+                v-model="sqlData.sqlWhere"
+              >
+              </el-input>
+            </div>
+          </div>
+        </div>
+        <!--  数据采集右侧部分--文本视图--->
+        <div v-if='sjcjRadio==1&&view=="2"' class="sjcjBox">
+          <textarea id="editText"></textarea>
+        </div>
+        <!--  数据采集右侧部分--非SQL型界面-->
+        <div v-if='sjcjRadio==0&&view=="1"' class="sjcjBox">
+          <div class="radioBoxBody">
+            <div class="radioBoxBodyRightss" style="width: calc(100% - 10px);">
+              <div
+                class="radioBoxBodyRightsDome"
+                v-for="(item,key) in noSqlData.fieldList"
+                :key="key"
+              >
+                <div
+                  @mouseenter="inDome(item)"
+                  @mouseleave="outDome(item)"
+                  class="radioBoxBodyRightsDomeTextConfigure"
+                  :title="item.fieldName"
+                >
+                  <span v-if="item.isNeed=='1'" style="color:#F92B2C;">*</span
+                  >{{item.fieldName}}:
+                </div>
+                <div
+                  class="radioBoxBodyRightsDomeInputConfigure"
+                  
+                >
+                <!-- style="width: calc(100% - 600px);" -->
+                  <el-input
+                    resize="none"
+                    autosize
+                    type="textarea"
+                    v-if="item.type=='textarea'"
+                    v-model="item.fieldValue"
+                    :ref="item.fieldId"
+                    size="mini"
+                  ></el-input>
+                  <el-input
+                    v-model="item.fieldValue"
+                    :ref="item.fieldId"
+                    v-else
+                    @focus="inputFocus(item)"
+                    size="mini"
+                  >
+                  </el-input>
+                </div>
+                <span
+                  v-if="item.zd"
+                  style="position: absolute;right: 10px;top: 50%;transform: translateY(-50%);"
+                  >字典</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--  数据采集右侧部分--文本视图-->
+        <div v-if='sjcjRadio==0&&view=="2"' class="sjcjBox">
+          <!-- 非SQL型界面 -->
+          <!-- <el-input type="textarea" resize="none" v-model="viewNoSql">
+          </el-input> -->
+          <textarea id="editText2"></textarea>
+        </div>
+        <!--  数据采集右侧部分--存储过程-->
+        <div v-if="sjcjRadio==2" class="sjcjBox">
+          <div style="display: flex;align-items: center;margin: 10px 0;">
+            <div style="width: 60px;text-align: right;">名称：</div>
+            <el-input
+              style="width: calc(100% - 500px);"
+              size="mini"
+              v-model="saveName"
+            ></el-input>
+          </div>
+          <div style="display: flex;align-items: flex-start;">
+            <div style="width: 60px;text-align: right;">参数：</div>
+            <div style="width: calc(100% - 470px);padding-right: 30px;">
+              <div
+                style="display: flex;margin-bottom: 10px;position: relative;"
+                v-for="(item, index) in saveParameter"
+                :key="index"
+              >
+                <el-input
+                  style="flex: 1;margin-right: 10px;"
+                  size="mini"
+                  v-model="item.cPName"
+                >
+                </el-input>
+                <el-select
+                  size="mini"
+                  v-model="item.cPFormat"
+                  style="flex: 1;margin-right: 10px;"
+                >
+                  <el-option
+                    v-for="item in selectDomeData"
+                    :key="item.value"
+                    :label="item.value"
+                    :value="item.value"
+                  >
+                  </el-option>
+                </el-select>
+                <el-select size="mini" v-model="item.cPType" style="flex: 1;">
+                  <el-option
+                    v-for="item in selectVarData"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  >
+                  </el-option>
+                </el-select>
+                <i
+                  @click="deleteSaveParameter(index)"
+                  style="font-size: 16px;color: #0480FF;position: absolute;top: 50%;transform: translateY(-50%);right: -25px;cursor: pointer;"
+                  class="el-icon-delete"
+                ></i>
+              </div>
+              <div @click="addParameter" style="cursor: pointer;">
+                <i class="el-icon-plus" style="font-weight: 700;"></i>
+                <span style="color: #0480FF;font-size: 14px;margin-left: 5px;"
+                  >添加参数</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <el-dialog
+      :title="type=='1'?'新增脚本':'复制脚本'"
+      append-to-body="true"
+      :visible.sync="addScriptDialog"
+      width="300px"
+      :close-on-click-modal = false
+    >
+      <div>
+        <el-form
+          :model="addScriptData"
+          :rules="rules"
+          ref="addScript"
+          label-width="90px"
+          class="demo-ruleForm"
+        >
+          <el-form-item label="脚本编码" prop="catalogCode">
+            <el-input
+              size="mini"
+              v-model="addScriptData.catalogCode"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="脚本名称" prop="catalogName">
+            <el-input
+              size="mini"
+              v-model="addScriptData.catalogName"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="版本" prop="version">
+            <el-input size="mini" v-model="addScriptData.version"></el-input>
+          </el-form-item>
+        </el-form>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button size="mini" type="primary" @click="addScriptYes"
+          >确 定</el-button
+        >
+        <el-button size="mini" @click="addScriptDialog = false"
+          >取 消</el-button
+        >
+      </span>
+    </el-dialog>
+
+    <el-dialog
+      :title="type=='1'?'新增SQL':'修改SQL'"
+      append-to-body="true"
+      :visible.sync="addSQLDialog"
+      width="300px"
+      :close-on-click-modal = false
+    >
+      <div>
+        <el-form
+          :model="addSQLData"
+          :rules="rules"
+          ref="addSQL"
+          label-width="90px"
+          class="demo-ruleForm"
+        >
+          <el-form-item label="SQL名称" prop="sqlName">
+            <el-input size="mini" v-model="addSQLData.sqlName"></el-input>
+          </el-form-item>
+        </el-form>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button size="mini" type="primary" @click="addSQLYes"
+          >确 定</el-button
+        >
+        <el-button size="mini" @click="addSQLDialog = false">取 消</el-button>
+      </span>
+    </el-dialog>
+
+    <el-dialog
+      append-to-body="true"
+      title="删除SQL"
+      class="deleteSQLDialogClass"
+      :visible.sync="deleteSQLDialog"
+      width="300px"
+      :close-on-click-modal = false
+    >
+      <span>确定要删除该条SQL吗</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button size="mini" type="primary" @click="deleteSqlYes"
+          >确 定</el-button
+        >
+        <el-button size="mini" @click="deleteSQLDialog = false"
+          >取 消</el-button
+        >
+      </span>
+    </el-dialog>
+
+    <el-dialog
+      :title="type=='1'?'新增临时字段':'修改临时字段'"
+      append-to-body="true"
+      :visible.sync="addLSFieldDialog"
+      width="300px"
+      :close-on-click-modal = false
+    >
+      <div>
+        <el-form
+          :model="addLSFieldData"
+          :rules="addLSFieldDataRules"
+          ref="addLSFieldData"
+          label-width="90px"
+          class="demoRuleForms"
+        >
+          <el-form-item label="字段标识" prop="element">
+            <el-input size="mini" v-model="addLSFieldData.element"></el-input>
+          </el-form-item>
+          <el-form-item label="字段名称" prop="alias">
+            <el-input size="mini" v-model="addLSFieldData.alias"></el-input>
+          </el-form-item>
+          <el-form-item label="描述信息" prop="description">
+            <el-input
+              size="mini"
+              type="textarea"
+              resize="none"
+              v-model="addLSFieldData.description"
+            ></el-input>
+          </el-form-item>
+        </el-form>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button size="mini" type="primary" @click="addLSFieldYes"
+          >确 定</el-button
+        >
+        <el-button size="mini" @click="addLSFieldDialog = false"
+          >取 消</el-button
+        >
+      </span>
+    </el-dialog>
+
+    <el-dialog
+      title="删除临时字段"
+      append-to-body="true"
+      :visible.sync="deleteLSFieldDialog"
+      width="300px"
+      :close-on-click-modal = false
+    >
+      <span style="margin-left: 15px;">确定要删除该临时字段吗</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button size="mini" type="primary" @click="deleteLSFieldYes"
+          >确 定</el-button
+        >
+        <el-button size="mini" @click="deleteLSFieldDialog = false"
+          >取 消</el-button
+        >
+      </span>
+    </el-dialog>
+    <!-- 新建数据采集脚本配置 --测试弹框 -->
+    <el-dialog
+      class="dataCollectTestDialogFormClassDialog"
+      append-to-body="true"
+      append-to-body="true"
+      :close-on-click-modal="false"
+      :visible.sync="dataCollectTestDialogVisible"
+      width="360px"
+      ref="dataCollectTestDialog"
+    >
+      <div slot="title">
+        <span class="dialogTitle">数据采集测试</span>
+      </div>
+      <el-divider />
+      <el-form
+        :model="dataCollectTestDialogForm"
+        :rules="dataCollectTestRules"
+        ref="dataCollectTestDialogForms"
+        class="testClass"
+        size="small"
+        label-width="140px"
+        style="padding-top: 20px;"
+      >
+        <el-form-item label="指定SourceId：" prop="appointSourceId">
+          <el-input
+            v-model="dataCollectTestDialogForm.appointSourceId"
+            style="width: 185px;"
+            oninput="value=value.replace(/[^\w_]/g,'')"
+          />
+        </el-form-item>
+        <el-form-item label="记录时间：" prop="recordTime">
+          <el-date-picker
+            value-format="yyyy-MM-dd HH:mm:ss"
+            format="yyyy-MM-dd HH:mm:ss"
+            style="width: 185px;"
+            v-model="dataCollectTestDialogForm.recordTime"
+            type="datetime"
+            placeholder="请选择日期"
+          >
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item>
+          <el-checkbox v-model="dataCollectTestDialogForm.ifUpLoad"
+            >上传</el-checkbox
+          >
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" size="small" @click="dataCollectTest"
+          >确 认</el-button
+        >
+        <el-button size="small" @click="dataCollectTestDialogVisible = false"
+          >取 消</el-button
+        >
+      </span>
+    </el-dialog>
+    <el-dialog
+      class="dataCollectTestDialoges"
+      append-to-body="true"
+      title="测试结果"
+      :close-on-click-modal="false"
+      :visible.sync="dataCollectTestDialogesVisible"
+      width="600px"
+    >
+      <div style="white-space: pre-wrap;" >
+        {{testInformation}}
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dataCollectTestDialogesVisible = false"
+          >取 消</el-button
+        >
+        <el-button
+          style="margin-right:40px;"
+          type="primary"
+          @click="dataCollectTestDialogesVisible = false"
+          >确 认</el-button
+        >
+      </span>
+    </el-dialog>
+    <!--描述信息 -->
+    <div v-if="descriptionDialog" class="description">
+      <div
+        style="display: flex;justify-content: space-between;align-items: center;height: 35px;"
+      >
+        <div style="color: #333;font-size: 16px;">描述信息</div>
+        <i
+          @click="descriptionDialog=false"
+          class="el-icon-close"
+          style="font-size: 16px;cursor: pointer;"
+        ></i>
+      </div>
+      <div>
+        <div style="display: flex;align-items: flex-start;margin-top: 10px;">
+          <div style="width: 110px;color: #999;text-align: right;">
+            卫生部标识符：
+          </div>
+          <div style="width:calc(100% - 120px);color: #333;">
+            {{descInfo.wsId}}
+          </div>
+        </div>
+        <div style="display: flex;align-items: flex-start;margin-top: 10px;">
+          <div style="width: 110px;color: #999;text-align: right;">
+            自定义标识符：
+          </div>
+          <div style="width:calc(100% - 120px);color: #333;">
+            {{descInfo.fieldId}}
+          </div>
+        </div>
+        <div style="display: flex;align-items: flex-start;margin-top: 10px;">
+          <div style="width: 110px;color: #999;text-align: right;">
+            数据类型：
+          </div>
+          <div style="width:calc(100% - 120px);color: #333;">
+            {{descInfo.dsType}}
+          </div>
+        </div>
+        <div style="display: flex;align-items: flex-start;margin-top: 10px;">
+          <div style="width: 110px;color: #999;text-align: right;">
+            数据长度：
+          </div>
+          <div style="width:calc(100% - 120px);color: #333;">
+            {{descInfo.dsLength}}
+          </div>
+        </div>
+        <div style="display: flex;align-items: flex-start;margin-top: 10px;">
+          <div style="width: 110px;color: #999;text-align: right;">
+            必填项：
+          </div>
+          <div style="width:calc(100% - 120px);color: #333;">
+            {{descInfo.nullable}}
+          </div>
+        </div>
+        <div style="display: flex;align-items: flex-start;margin-top: 10px;">
+          <div style="width: 110px;color: #999;text-align: right;">字典：</div>
+          <div style="width:calc(100% - 120px);color: #333;">
+            {{descInfo.dicID}}
+          </div>
+        </div>
+        <div style="display: flex;align-items: flex-start;margin-top: 10px;">
+          <div style="width: 110px;color: #999;text-align: right;">定义：</div>
+          <div style="width:calc(100% - 120px);color: #333;">
+            {{descInfo.define}}
+          </div>
+        </div>
+        <div style="display: flex;align-items: flex-start;margin-top: 10px;">
+          <div style="width: 110px;color: #999;text-align: right;">
+            空时默认值：
+          </div>
+          <div style="width:calc(100% - 120px);color: #333;">
+            {{descInfo.default}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

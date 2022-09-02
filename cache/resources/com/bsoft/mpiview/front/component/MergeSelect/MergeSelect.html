@@ -1,0 +1,389 @@
+<div class="merge-select">
+    <el-row :gutter="20">
+        <el-form label-width="120px">
+            <el-col span="8">
+                <el-form-item label="合并结果" class="top-item">
+                </el-form-item>
+            </el-col>
+            <el-col span="16">
+                <el-row class="item-pd">
+                    <el-col span="12">
+                        <el-form-item label-width="0" class="top-item">
+                            <el-checkbox v-model="selectForm1All" @change="selectAllChange($event, 'mergeForm1')">主记录
+                            </el-checkbox>
+                        </el-form-item>
+                    </el-col>
+                    <el-col span="12">
+                        <el-form-item label-width="0" class="top-right-item">
+                            <el-checkbox v-model="selectForm2All" @change="selectAllChange($event, 'mergeForm2')">主记录
+                            </el-checkbox>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+            </el-col>
+        </el-form>
+    </el-row>
+    <el-row :gutter="20" class="item-pd">
+        <el-col span="8">
+            <el-form :model="resultForm" label-width="120px" class="form">
+                <el-tooltip effect="dark" :content="`MPIID: ${resultForm.mpiId || '--'}`" placement="bottom">
+                    <el-form-item label="MPIID:">
+                        <span>{{resultForm.mpiId || '--'}}</span>
+                    </el-form-item>
+                </el-tooltip>
+                <el-form-item label="患者姓名:">
+                    <span>{{resultForm.name || '--'}}</span>
+                </el-form-item>
+                <el-form-item label="身份证:">
+                    <span>{{resultForm.idCard || '--'}}</span>
+                </el-form-item>
+                <el-form-item label="性别:">
+                    <span>{{resultForm.sexName || resultForm.sex || '--'}}</span>
+                </el-form-item>
+                <el-form-item label="出生日期:">
+                    <span>{{resultForm.birthDate && resultForm.birthDate.slice(0, 10) || '--'}}</span>
+                </el-form-item>
+                <el-form-item label="联系电话:">
+                    <span>{{resultForm.patientPhone || '--'}}</span>
+                </el-form-item>
+                <el-form-item label="国籍:">
+                    <span>{{resultForm.nationalityName || resultForm.nationality || '--'}}</span>
+                </el-form-item>
+                <el-form-item label="护照:">
+                    <span>{{resultForm.passPort || '--'}}</span>
+                </el-form-item>
+                <el-form-item label="民族:">
+                    <span>{{resultForm.ethnicGroupName || resultForm.ethnicGroup || '--'}}</span>
+                </el-form-item>
+                <el-form-item label="婚姻状况:">
+                    <span>{{resultForm.maritalStatusName || resultForm.maritalStatus || '--'}}</span>
+                </el-form-item>
+                <el-form-item label="职业类别:">
+                    <span>{{resultForm.occupationCategoryCodeName || resultForm.occupationCategoryCode || '--'}}</span>
+                </el-form-item>
+                <el-form-item label="社保卡号:">
+                    <span>{{resultForm.healthInsuranceCardId || '--'}}</span>
+                </el-form-item>
+                <el-form-item label="医保类别:">
+                    <span>{{resultForm.medicalInsuranceCategoryCodeName || resultForm.medicalInsuranceCategoryCode || '--'}}</span>
+                </el-form-item>
+                <el-form-item label="血型:">
+                    <span>{{resultForm.bloodCodeName || resultForm.bloodCode || '--'}}</span>
+                </el-form-item>
+                <el-form-item label="RH血型:">
+                    <span>{{resultForm.rhBloodCodeName || resultForm.rhBloodCode || '--'}}</span>
+                </el-form-item>
+                <el-form-item label="军官证:">
+                    <span>{{resultForm.militaryId || '--'}}</span>
+                </el-form-item>
+                <el-form-item label="健康卡号:">
+                    <span>{{resultForm.healthCardId || '--'}}</span>
+                </el-form-item>
+                <el-form-item label="市民卡号:">
+                    <span>{{resultForm.citizenCard || '--'}}</span>
+                </el-form-item>
+                <el-tooltip effect="dark" :content="`港澳居民往来内地通行证: ${resultForm.hongKongAndMaCaoTravelPermit || '--'}`" placement="bottom">
+                    <el-form-item label="港澳居民往来内地通行证:">
+                        <span>{{resultForm.hongKongAndMaCaoTravelPermit || '--'}}</span>
+                    </el-form-item>
+                </el-tooltip>
+                <el-form-item label="自费卡号:">
+                    <span>{{resultForm.selfExpenseCard || '--'}}</span>
+                </el-form-item>
+                <el-form-item label="银联卡号:">
+                    <span>{{resultForm.unionPayCard || '--'}}</span>
+                </el-form-item>
+                <el-tooltip effect="dark" :content="`台湾居民往来内地通行证: ${resultForm.taiWanTravelPermit || '--'}`" placement="bottom">
+                    <el-form-item label="台湾居民往来内地通行证:">
+                        <span>{{resultForm.taiWanTravelPermit || '--'}}</span>
+                    </el-form-item>
+                </el-tooltip>
+                <el-form-item label="文化程度:">
+                    <span>{{resultForm.educationCodeName || resultForm.educationCode || '--'}}</span>
+                </el-form-item>
+                <el-form-item label="健康档案编号:">
+                    <span>{{resultForm.healthRecordId || '--'}}</span>
+                </el-form-item>
+            </el-form>
+        </el-col>
+        <el-col span="16">
+            <el-row>
+                <el-col span="12">
+                    <el-form :model="mergeForm1" label-width="0" class="form">
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm1.mpiId" @change="mergeForm1Change($event, 'mpiId')"
+                                :true-label="mergeFormData1.mpiId">{{mergeFormData1.mpiId || '--'}}</el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm1.name" @change="mergeForm1Change($event, 'name')"
+                                :true-label="mergeFormData1.name">{{mergeFormData1.name || '--'}}</el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm1.idCard" @change="mergeForm1Change($event, 'idCard')"
+                                :true-label="mergeFormData1.idCard">{{mergeFormData1.idCard || '--'}}</el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm1.sex" @change="mergeForm1Change($event, 'sex')"
+                                :true-label="mergeFormData1.sex">{{mergeFormData1.sexName || mergeFormData1.sex ||'--'}}</el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm1.birthDate" @change="mergeForm1Change($event, 'birthDate')"
+                                :true-label="mergeFormData1.birthDate">{{mergeFormData1.birthDate && mergeFormData1.birthDate.slice(0, 10) || '--'}}
+                            </el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm1.patientPhone"
+                                @change="mergeForm1Change($event, 'patientPhone')"
+                                :true-label="mergeFormData1.patientPhone">{{mergeFormData1.patientPhone || '--'}}
+                            </el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm1.nationality"
+                                @change="mergeForm1Change($event, 'nationality')"
+                                :true-label="mergeFormData1.nationality">{{mergeFormData1.nationalityName || mergeFormData1.nationality || '--'}}
+                            </el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm1.passPort" @change="mergeForm1Change($event, 'passPort')"
+                                :true-label="mergeFormData1.passPort">{{mergeFormData1.passPort || '--'}}</el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm1.ethnicGroup"
+                                @change="mergeForm1Change($event, 'ethnicGroup')"
+                                :true-label="mergeFormData1.ethnicGroup">{{mergeFormData1.ethnicGroupName || mergeFormData1.ethnicGroup || '--'}}
+                            </el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm1.maritalStatus"
+                                @change="mergeForm1Change($event, 'maritalStatus')"
+                                :true-label="mergeFormData1.maritalStatus">{{mergeFormData1.maritalStatusName || mergeFormData1.maritalStatus || '--'}}
+                            </el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm1.occupationCategoryCode"
+                                @change="mergeForm1Change($event, 'occupationCategoryCode')"
+                                :true-label="mergeFormData1.occupationCategoryCode">
+                                {{mergeFormData1.occupationCategoryCodeName || mergeFormData1.occupationCategoryCode ||'--'}}</el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm1.healthInsuranceCardId"
+                                @change="mergeForm1Change($event, 'healthInsuranceCardId')"
+                                :true-label="mergeFormData1.healthInsuranceCardId">{{mergeFormData1.healthInsuranceCardId ||
+                                '--'}}</el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm1.medicalInsuranceCategoryCode"
+                                @change="mergeForm1Change($event, 'medicalInsuranceCategoryCode')"
+                                :true-label="mergeFormData1.medicalInsuranceCategoryCode">
+                                {{mergeFormData1.medicalInsuranceCategoryCodeName || mergeFormData1.medicalInsuranceCategoryCode || '--'}}</el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm1.bloodCode" @change="mergeForm1Change($event, 'bloodCode')"
+                                :true-label="mergeFormData1.bloodCode">{{mergeFormData1.bloodCodeName || mergeFormData1.bloodCode || '--'}}
+                            </el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm1.rhBloodCode"
+                                @change="mergeForm1Change($event, 'rhBloodCode')"
+                                :true-label="mergeFormData1.rhBloodCode">{{mergeFormData1.rhBloodCodeName || mergeFormData1.rhBloodCode || '--'}}
+                            </el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm1.militaryId"
+                                @change="mergeForm1Change($event, 'militaryId')"
+                                :true-label="mergeFormData1.militaryId">{{mergeFormData1.militaryId || '--'}}
+                            </el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm1.healthCardId"
+                                @change="mergeForm1Change($event, 'healthCardId')"
+                                :true-label="mergeFormData1.healthCardId">{{mergeFormData1.healthCardId || '--'}}
+                            </el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm1.citizenCard"
+                                @change="mergeForm1Change($event, 'citizenCard')"
+                                :true-label="mergeFormData1.citizenCard">{{mergeFormData1.citizenCard || '--'}}
+                            </el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm1.hongKongAndMaCaoTravelPermit"
+                                @change="mergeForm1Change($event, 'hongKongAndMaCaoTravelPermit')"
+                                :true-label="mergeFormData1.hongKongAndMaCaoTravelPermit">
+                                {{mergeFormData1.hongKongAndMaCaoTravelPermit || '--'}}</el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm1.selfExpenseCard"
+                                @change="mergeForm1Change($event, 'selfExpenseCard')"
+                                :true-label="mergeFormData1.selfExpenseCard">{{mergeFormData1.selfExpenseCard || '--'}}
+                            </el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm1.unionPayCard"
+                                @change="mergeForm1Change($event, 'unionPayCard')"
+                                :true-label="mergeFormData1.unionPayCard">{{mergeFormData1.unionPayCard || '--'}}
+                            </el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm1.taiWanTravelPermit"
+                                @change="mergeForm1Change($event, 'taiWanTravelPermit')"
+                                :true-label="mergeFormData1.taiWanTravelPermit">{{mergeFormData1.taiWanTravelPermit ||
+                                '--'}}</el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm1.educationCode"
+                                @change="mergeForm1Change($event, 'educationCode')"
+                                :true-label="mergeFormData1.educationCode">{{mergeFormData1.educationCodeName || mergeFormData1.educationCode ||
+                                '--'}}</el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm1.healthRecordId"
+                                @change="mergeForm1Change($event, 'healthRecordId')"
+                                :true-label="mergeFormData1.healthRecordId">{{mergeFormData1.healthRecordId ||
+                                '--'}}</el-checkbox>
+                        </el-form-item>
+                    </el-form>
+                </el-col>
+                <el-col span="12">
+                    <el-form :model="mergeForm2" label-width="0">
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm2.mpiId" :checked="checkFlag.mpiId"
+                                @change="mergeForm2Change($event, 'mpiId')" :true-label="mergeFormData2.mpiId">
+                                {{mergeFormData2.mpiId || '--'}}</el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm2.name" @change="mergeForm2Change($event, 'name')"
+                                :true-label="mergeFormData2.name">{{mergeFormData2.name || '--'}}</el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm2.idCard" @change="mergeForm2Change($event, 'idCard')"
+                                :true-label="mergeFormData2.idCard">{{mergeFormData2.idCard || '--'}}</el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm2.sex" @change="mergeForm2Change($event, 'sex')"
+                                :true-label="mergeFormData2.sex">{{mergeFormData2.sexName || mergeFormData2.sex || '--'}}</el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm2.birthDate" @change="mergeForm2Change($event, 'birthDate')"
+                                :true-label="mergeFormData2.birthDate">{{mergeFormData2.birthDate && mergeFormData2.birthDate.slice(0, 10) || '--'}}
+                            </el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm2.patientPhone"
+                                @change="mergeForm2Change($event, 'patientPhone')"
+                                :true-label="mergeFormData2.patientPhone">{{mergeFormData2.patientPhone || '--'}}
+                            </el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm2.nationality"
+                                @change="mergeForm2Change($event, 'nationality')"
+                                :true-label="mergeFormData2.nationality">{{mergeFormData2.nationalityName || '--'}}
+                            </el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm2.passPort"
+                                @change="mergeForm2Change($event, 'passPort')"
+                                :true-label="mergeFormData2.passPort">{{mergeFormData2.passPort || '--'}}
+                            </el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm2.ethnicGroup"
+                                @change="mergeForm2Change($event, 'ethnicGroup')"
+                                :true-label="mergeFormData2.ethnicGroup">{{mergeFormData2.ethnicGroupName || mergeFormData2.ethnicGroup || '--'}}
+                            </el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm2.maritalStatus"
+                                @change="mergeForm2Change($event, 'maritalStatus')"
+                                :true-label="mergeFormData2.maritalStatus">{{mergeFormData2.maritalStatusName || mergeFormData2.maritalStatus || '--'}}
+                            </el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm2.occupationCategoryCode"
+                                @change="mergeForm2Change($event, 'occupationCategoryCode')"
+                                :true-label="mergeFormData2.occupationCategoryCode">
+                                {{mergeFormData2.occupationCategoryCodeName || mergeFormData2.occupationCategoryCode || '--'}}</el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm2.healthInsuranceCardId"
+                                @change="mergeForm2Change($event, 'healthInsuranceCardId')"
+                                :true-label="mergeFormData2.healthInsuranceCardId">
+                                {{mergeFormData2.healthInsuranceCardId || '--'}}</el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm2.medicalInsuranceCategoryCode"
+                                @change="mergeForm2Change($event, 'medicalInsuranceCategoryCode')"
+                                :true-label="mergeFormData2.medicalInsuranceCategoryCode">
+                                {{mergeFormData2.medicalInsuranceCategoryCodeName || mergeFormData2.medicalInsuranceCategoryCode || '--'}}</el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm2.bloodCode" @change="mergeForm2Change($event, 'bloodCode')"
+                                :true-label="mergeFormData2.bloodCode">{{mergeFormData2.bloodCodeName || mergeFormData2.bloodCode || '--'}}
+                            </el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm2.rhBloodCode"
+                                @change="mergeForm2Change($event, 'rhBloodCode')"
+                                :true-label="mergeFormData2.rhBloodCode">{{mergeFormData2.rhBloodCodeName || mergeFormData2.rhBloodCode || '--'}}
+                            </el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm2.militaryId"
+                                @change="mergeForm2Change($event, 'militaryId')"
+                                :true-label="mergeFormData2.militaryId">{{mergeFormData2.militaryId || '--'}}
+                            </el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm2.healthCardId"
+                                @change="mergeForm2Change($event, 'healthCardId')"
+                                :true-label="mergeFormData2.healthCardId">{{mergeFormData2.healthCardId || '--'}}
+                            </el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm2.citizenCard"
+                                @change="mergeForm2Change($event, 'citizenCard')"
+                                :true-label="mergeFormData2.citizenCard">{{mergeFormData2.citizenCard || '--'}}
+                            </el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm2.hongKongAndMaCaoTravelPermit"
+                                @change="mergeForm2Change($event, 'hongKongAndMaCaoTravelPermit')"
+                                :true-label="mergeFormData2.hongKongAndMaCaoTravelPermit">
+                                {{mergeFormData2.hongKongAndMaCaoTravelPermit || '--'}}</el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm2.selfExpenseCard"
+                                @change="mergeForm2Change($event, 'selfExpenseCard')"
+                                :true-label="mergeFormData2.selfExpenseCard">{{mergeFormData2.selfExpenseCard || '--'}}
+                            </el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm2.unionPayCard"
+                                @change="mergeForm2Change($event, 'unionPayCard')"
+                                :true-label="mergeFormData2.unionPayCard">{{mergeFormData2.unionPayCard || '--'}}
+                            </el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm2.taiWanTravelPermit"
+                                @change="mergeForm2Change($event, 'taiWanTravelPermit')"
+                                :true-label="mergeFormData2.taiWanTravelPermit">{{mergeFormData2.taiWanTravelPermit ||
+                                '--'}}</el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm2.educationCode"
+                                @change="mergeForm2Change($event, 'educationCode')"
+                                :true-label="mergeFormData2.educationCode">{{mergeFormData2.educationCodeName || mergeFormData2.educationCode ||
+                                '--'}}</el-checkbox>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="mergeForm2.healthRecordId"
+                                @change="mergeForm2Change($event, 'healthRecordId')"
+                                :true-label="mergeFormData2.healthRecordId">{{mergeFormData2.healthRecordId ||
+                                '--'}}</el-checkbox>
+                        </el-form-item>
+                    </el-form>
+                </el-col>
+            </el-row>
+        </el-col>
+    </el-row>
+</div>

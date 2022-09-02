@@ -1,0 +1,40 @@
+<div class="patient-track mpi-container" ref="patientTrack">
+    <el-timeline v-if="trackList.length" v-loading="tableLoading"
+    element-loading-text="加载中"
+    element-loading-spinner="el-icon-loading"
+    element-loading-background="hsla(0,0%,100%,.9)">
+        <el-timeline-item type="primary" class="timeline-item" v-for="(item, index) in trackList" :key="index">
+            <div class="top">
+                <span class="icon"></span>
+                <span class="type">{{item.type | typeFilter}}</span>
+                <span class="person">{{item.operatorName}}</span>
+                <span class="time">{{item.operateTime}}</span>
+            </div>
+            <div class="content">
+                <div class="list" :class="{'expand': item.expand}" v-if="item.contentJson.length">
+                    <div class="item" v-for="part in item.contentJson" :key="part">
+                        <div class="name">{{part.field}}：</div>
+                        <div class="cont">
+                            <span v-if="item.type !== typeEnums.REGISTER.code">
+                                <span>{{part.old || '--'}}</span>
+                            </span>
+                            <span class="to" v-if="item.type !== typeEnums.REGISTER.code">></span>
+                            <span>{{part.new || '--'}}</span>
+                            </span>
+                        </div>
+                        <!-- <div>{{part}}</div> -->
+                    </div>
+                </div>
+                <div v-else class="bottom-tip">暂无数据变动</div>
+                <div class="tc" v-if="item.contentJson.length > 5" @click="item.expand = !item.expand"><span
+                        class="hand blue">{{item.expand ? '关闭' : '展开'}} <i
+                            :class="item.expand ? 'el-icon-arrow-up' : 'el-icon-arrow-down'"></i></span></div>
+            </div>
+        </el-timeline-item>
+    </el-timeline>
+    <div class="null-tip" v-else v-loading="tableLoading"
+    element-loading-text="加载中"
+    element-loading-spinner="el-icon-loading"
+    element-loading-background="hsla(0,0%,100%,.9)">暂无轨迹数据</div>
+    <!-- <div v-if="isBottom" class="bottom-tip">已经到底啦...</div> -->
+</div>

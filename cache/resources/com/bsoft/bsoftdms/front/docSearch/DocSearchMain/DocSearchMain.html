@@ -1,0 +1,93 @@
+<!--具体内容_主页-->
+<div style="height: calc(100% - 111px);">
+    <!--搜索条件-->
+    <div style="width: 100%; height: 64px; line-height: 64px;">
+        <span style="margin-left: 30px">文档类型：</span>
+        <el-select v-model="thsDocType" placeholder="请选择" class="el-input--mini" style="width: 150px">
+            <el-option
+                    v-for="item in thsDocFormatOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+            </el-option>
+        </el-select>
+
+        <span style="margin-left: 20px">数据集：</span>
+        <el-select multiple
+                   clearable
+                   collapse-tags
+                   filterable
+                   v-model="thsDataSetCode"
+                   placeholder="请选择"
+                   class="el-input--mini"
+                   style="width: 200px; "
+                   size="mini"
+                   @change="dataSetChange"
+                   @visible-change="sss($event,2)"
+        >
+            <el-option label='全选' value='all' @click.native='selectFormAll'></el-option>
+            <el-option
+                    v-for="item in thsOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+            </el-option>
+        </el-select>
+
+        <span style="margin-left: 20px">记录时间：</span>
+        <el-date-picker
+                style="width: auto;"
+                size="mini"
+                v-model="thsChooseDate"
+                type="daterange"
+                range-separator="至"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期">
+        </el-date-picker>
+
+        <el-button type="primary" size="mini" style="margin-left: 30px" @click="queryDocGroupByParam">查询</el-button>
+    </div>
+    <!--那根虚线-->
+    <div style="border: 1px #ccc dashed;margin-left: 30px; margin-right: 30px;"></div>
+    <div style="width: 100%; height: calc(100% - 65px);overflow-y: auto;" v-loading="folderLoading">
+        <div style="" :class="thsCheckedItems.indexOf(index) =='-1' ? 'cardMargin':'cardMargin cardMarginCheck'"
+             v-for="(o, index) in thsAllDateData" @click="checkMenu(index)">
+            <div style="padding: 20px; position: relative" @dblclick="showChildMenu(o)" :id="o.id">
+                <div style="position: absolute; top: 0; right: 0;" v-show="thsCheckedItems.indexOf(index) != '-1'">
+                    <i style="font-size: 25px; float: left;color: #06A8FF" class="iconfont iconwdjs_select"></i>
+                </div>
+                <div
+                        style="height: 3px; width: 24px; background-color: rgb(255, 255, 255); position: absolute; left: 24px; top: 30px;"></div>
+                <i style="font-size: 30px; float: left;color: #FFCC24;margin-right: 12px"
+                   class="iconfont iconwdjs_folder"></i>
+                <div>{{o.menuName}}</div>
+                <div style="font-size: 10px; color: #999999">{{o.storageTime}}</div>
+            </div>
+        </div>
+    </div>
+    <!--脚部-->
+    <div style="width: 100%; height: 46px;line-height: 46px; background-color: #FAFAFA;font-size: 12px">
+        <div style="display: inline-block;text-indent: 8px;margin-left: 20px" v-show="isInit">
+            <span style="color: #999999">目录名称:</span>
+            <span>{{thsChooseDateData.menuName}}</span>
+        </div>
+        <div style="display: inline-block;text-indent: 8px;margin-left: 30px" v-show="isInit">
+            <span style="color: #999999">文件个数:</span>
+            <span>{{thsChooseDateData.docTotal}}</span>
+        </div>
+        <div style="display: inline-block;text-indent: 8px;margin-left: 30px" v-show="isInit">
+            <span style="color: #999999">文档类型:</span>
+            <span>{{thsChooseDateData.docType}}</span>
+        </div>
+        <div style="display: inline-block;text-indent: 8px;margin-left: 30px" v-show="isInit">
+            <span style="color: #999999">存储时间:</span>
+            <span>{{thsChooseDateData.storageTime}}</span>
+        </div>
+
+        <div style="text-indent: 5px;display: inline-block; position: absolute; right: 60px">
+            <el-checkbox @change="allCheckedClick" v-model="thsAllChecked" style="margin-right: 20px">全选
+            </el-checkbox>
+            <el-button @click="exportCheckDocs" type="primary" size="mini">导出</el-button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,9 @@
+<div class="history-chart">
+    <div class="line historyLine" ref="historyLine" v-if="!nullData"></div>
+    <div class="no-data"  v-if="nullData">
+        <img src="resources/com/bsoft/mpiview/front/images/common/no-data.png" alt="">
+        <p>
+            暂无数据...
+        </p>
+    </div>
+</div>

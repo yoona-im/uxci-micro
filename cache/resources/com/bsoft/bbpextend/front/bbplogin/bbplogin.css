@@ -1,0 +1,156 @@
+.bbplogin {
+    min-height: 550px;
+    height: 100%;
+    min-width: 1100px;
+
+}
+
+.bbplogin .loginHeader {
+    height: 60px;
+    line-height: 60px;
+    /* background-color: pink; */
+}
+
+.bbplogin .loginHeader-left {
+    float: left;
+}
+
+.bbplogin .loginHeader-right {
+    float: right;
+}
+
+.bbplogin .login {
+    color: green;
+}
+
+.bbplogin .logout {
+    color: red;
+}
+
+.bbplogin #rectangle {
+    width: 100%;
+    height: 100%;
+}
+
+.bbplogin #platform {
+    width: 100%;
+    height: 100%;
+}
+
+.bbplogin .pagetion {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-end;
+
+}
+
+.bbplogin .el-date-editor.el-input__inner {
+    width: 350px;
+    margin-left: 10px;
+}
+
+.bbplogin .el-input__inner {
+    height: 32px;
+}
+
+.bbplogin .el-input .el-input--suffix .el-input__inne {
+    width: 100%;
+}
+
+.bbplogin .el-input__icon {
+    line-height: 28px;
+}
+
+.bbplogin .el-row {
+    margin: 10px !important;
+}
+
+.bbplogin .first-row {
+    height: calc(50% - 50px);
+}
+
+.bbplogin .sencond-row {
+    height: 45%;
+}
+
+.bbplogin .el-col {
+    height: 100%;
+}
+
+.bbplogin .timeDiv {
+    margin-left: 5px;
+}
+
+.bbplogin .title > .more-text {
+    float: right;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: Microsoft YaHei;
+    font-weight: 400;
+    color: #0d99e4;
+    margin-right: 10px;
+}
+
+/* 滚动条 */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+/* 滚动条滑块 */
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: #bde6ff;
+    box-shadow: inset 0 0 6px #bde6ff;
+}
+
+::-webkit-scrollbar-thumb:window-inactive {
+    background: #bde6ff;
+}
+
+/* 滚动条 */
+::-moz-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+/* 滚动条滑块 */
+::-moz-scrollbar-thumb {
+    border-radius: 10px;
+    background: #bde6ff;
+    box-shadow: inset 0 0 6px #bde6ff;
+}
+
+::-moz-scrollbar-thumb:window-inactive {
+    background: #bde6ff;
+}
+
+/* 滚动条 */
+::-ms-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+/* 滚动条滑块 */
+::-ms-scrollbar-thumb {
+    border-radius: 10px;
+    background: #bde6ff;
+    box-shadow: inset 0 0 6px #bde6ff;
+}
+
+::-ms-scrollbar-thumb:window-inactive {
+    background: #bde6ff;
+}
+
+/* 滚动条 */
+::-o-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+/* 滚动条滑块 */
+::-o-scrollbar-thumb {
+    border-radius: 10px;
+    background: #bde6ff;
+    box-shadow: inset 0 0 6px #bde6ff;
+}

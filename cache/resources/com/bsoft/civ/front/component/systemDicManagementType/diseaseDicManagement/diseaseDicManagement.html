@@ -1,0 +1,158 @@
+<div class="disease-dic-management">
+    <!-- left-catalog-tree-con -->
+    <div class="left-catalog-tree-con">
+        <div class="title-con">
+            <span>疾病类目</span>
+        </div>
+        <div class="tree-con">
+            <el-tree v-loading="diseaseCatalogTreeLoading" node-key="illnessCatalogCode" class="disease-catalog-tree"
+                :data="diseaseCatalogTreeData" ref="diseaseCatalogTree" :props="diseaseCatalogTreeProps"
+                @node-click="diseaseCatalogTreeNodeClick">
+                <div class="custom-tree-node" slot-scope="{ node, data }" style="width: 100%;"
+                    :id="'diseaseCatalogTree' + data.illnessCatalogCode">
+                    <i class="folder-icon iconfont civ-icon_yy" v-if="!node.expanded"></i>
+                    <i class="folder-icon iconfont civ-icon_yyy" v-if="node.expanded"></i>
+                    <span>{{data.illnessCatalogCode}} {{data.illnessCatalogName}}</span>
+                </div>
+            </el-tree>
+        </div>
+    </div>
+    <!-- right-disease-table-con -->
+    <div class="right-disease-table-con">
+        <!-- title-con -->
+        <div class="title-con">
+            <span class="title-label">疾病归类</span>
+            <el-button @click="autoMatch" type="primary" size="mini"
+                style="float: right; margin-top: 10px; margin-right: 10px;" :loading="autoMatchLoading"
+                v-show="autoMatchShow">自动匹配
+            </el-button>
+            <el-button @click="importDisease" size="mini" style="float: right; margin-top: 10px; margin-right: 10px;"
+                v-show="importDiseaseShow">导入
+            </el-button>
+        </div>
+        <!-- search-con -->
+        <div class="search-con">
+            <span class="search-label">机构 : </span>
+            <el-select v-model="searchOrgCode" size="mini" filterable>
+                <el-option v-for="(item, index) in searchOrgCodeSelect" :key="index" :label="item.organizationName"
+                    :value="item.organizationCode">
+                </el-option>
+            </el-select>
+            <span class="search-label">所属类目 : </span>
+            <el-select v-model="searchDiseaseCatalogCode" size="mini" filterable>
+                <el-option v-for="(item, index) in diseaseCatalogSelect" :key="index" :label="item.label"
+                    :value="item.value">
+                </el-option>
+            </el-select>
+            <el-input class="search-input" placeholder="请输入编码或者名称检索" v-model="searchText" size="mini" clearable
+                style="width: 200px;" @keydown.enter.native="searchDisease">
+                <i slot="suffix" class="iconfont civ-ico_opt_search" style="cursor: pointer;"
+                    @click="searchDisease"></i>
+            </el-input>
+            <el-button @click="searchDisease" type="primary" size="mini" style="margin-left: 20px;">查询</el-button>
+        </div>
+        <!-- table-con -->
+        <div class="table-con">
+            <el-table v-loading="diseaseTableLoading" class="disease-table" border :data="diseaseTableData"
+                ref="diseaseTable" header-cell-style="background-color: #ebf4ff; color: #333;"
+                height="calc(100% - 60px)" @row-dblclick="diseaseTableDblClick">
+                <el-table-column type="index" label="序号" width="70" align="center"></el-table-column>
+                <el-table-column prop="organization" label="机构" width="180" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{formatOrganization(scope.row.organization)}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="illnessCode" label="疾病编码">
+                </el-table-column>
+                <el-table-column prop="illnessName" label="疾病名称" :show-overflow-tooltip="true">
+                </el-table-column>
+                <el-table-column prop="illnessCatalog" label="所属类目">
+                </el-table-column>
+                <el-table-column width="80" label="操作" align="center">
+                    <template slot-scope="scope">
+                        <el-tooltip class="item" effect="dark" content="归类" :enterable='false' placement="top">
+                            <span class="iconfont civ-ico_opt_link"
+                                style="color: #0480ff; cursor: pointer; margin-right: 10px;"
+                                @click='changeCatalog(scope.row)'></span>
+                        </el-tooltip>
+                        <el-tooltip class="item" effect="dark" content="取消" :enterable='false' placement="top">
+                            <span class="iconfont civ-ico_opt_circle_close" style="color: #0480ff; cursor: pointer;"
+                                @click='delDisease(scope.row)'></span>
+                        </el-tooltip>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <el-pagination @size-change="diseaseTableSizeChange" @current-change="diseaseTableCurrentChange"
+                :pager-count="10" :page-sizes="[10, 20, 30, 50]" :page-size="diseaseTableSearchPageSize"
+                layout="total, sizes, prev, pager, next, jumper" style="margin-top: 20px; float: right"
+                :total="diseaseTableDataTotal" :current-page="diseaseTableSearchPageNum">
+            </el-pagination>
+        </div>
+    </div>
+    <!-- import-disease-dialog -->
+    <el-dialog class="import-disease-dialog" title="导入" :visible.sync="importDiseaseDialogVisible" width="500px"
+        :modal-append-to-body="false" :close-on-click-modal="false" @close="importDiseaseDialogClose">
+        <div class="content">
+            <el-form :model="importDiseaseFormData" class="import-disease-form" :rules="importDiseaseFormRules"
+                ref="importDiseaseForm">
+                <el-form-item class="import-disease-org-form-item" label-width="100px" label="机构 : " prop="orgCode">
+                    <el-select v-model="importDiseaseFormData.orgCode" size="mini" filterable>
+                        <el-option v-for="(item, index) in importDiseaseOrgCodeSelect" :key="index"
+                            :label="item.organizationName" :value="item.organizationCode">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item class="import-disease-file-form-item" label-width="100px" label="疾病文档 : " prop="fileList">
+                    <el-upload ref="importDiseaseFileUpload" class="import-disease-file-upload"
+                        :http-request="realImportDisease" accept=".xls" :limit="1" :on-change="handleChange"
+                        :auto-upload="false" :file-list="importDiseaseFormData.fileList">
+                        <el-button size="mini" type="primary">点击上传</el-button>
+                        <el-button size="mini" type="text" @click.stop="downloadExcel" :loading="downloadExcelLoading">
+                            下载模版</el-button>
+                        <div slot="tip" class="el-upload__tip">只允许上传一份 excel 格式的文件</div>
+                    </el-upload>
+                </el-form-item>
+                <el-form-item class="import-disease-status-form-item" label-width="100px" label="导入类型 : " prop="status">
+                    <el-radio-group v-model="importDiseaseFormData.status">
+                        <el-radio :label="1">清空导入</el-radio>
+                        <el-radio :label="0">覆盖导入</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+            </el-form>
+        </div>
+        <div slot="footer">
+            <el-button type="primary" @click="confirmImportDisease" size="small">确 认</el-button>
+            <el-button @click="importDiseaseDialogVisible = false" size="small">取 消</el-button>
+        </div>
+    </el-dialog>
+    <!-- change-disease-catalog-dialog -->
+    <el-dialog class="change-disease-catalog-dialog" title="疾病关联" :visible.sync="changeDiseaseCatalogDialogVisible"
+        width="550px" :modal-append-to-body="false" :close-on-click-modal="false">
+        <div class="content">
+            <div class="search-con">
+                <el-input class="search-input" placeholder="请输入分类名称检索" v-model="changeDiseaseCatalogDialogSearchText"
+                    size="mini" clearable style="width: 430px;" @keydown.enter.native="searchDiseaseCatalog">
+                    <i slot="suffix" class="iconfont civ-ico_opt_search" style="cursor: pointer;"
+                        @click="searchDiseaseCatalog"></i>
+                </el-input>
+                <el-button @click="searchDiseaseCatalog" type="primary" size="mini" style="margin-left: 20px;">查询
+                </el-button>
+            </div>
+            <div class="disease-catalog-tree-con">
+                <el-tree class="disease-catalog-tree" :data="diseaseCatalogTreeData" ref="diseaseCatalogInterTree"
+                    :props="diseaseCatalogTreeProps" :filter-node-method="diseaseCatalogInterTreeFilter"
+                    style="height: 340px; overflow: auto;">
+                    <div class="custom-tree-node" slot-scope="{ node, data }" style="width: 100%;">
+                        <i class="folder-icon iconfont civ-icon_yy" v-if="!node.expanded"></i>
+                        <i class="folder-icon iconfont civ-icon_yyy" v-if="node.expanded"></i>
+                        <span>{{data.illnessCatalogCode}} {{data.illnessCatalogName}}</span>
+                    </div>
+                </el-tree>
+            </div>
+        </div>
+        <div slot="footer">
+            <el-button type="primary" @click="realchangeDiseaseCatalog" size="small">确 认</el-button>
+            <el-button @click="changeDiseaseCatalogDialogVisible = false" size="small">取 消</el-button>
+        </div>
+    </el-dialog>
+</div>

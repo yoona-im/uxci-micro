@@ -1,0 +1,4 @@
+@import "./common.scss";
+.search_row::v-deep .el-form-item__label {
+    font-weight: normal !important;
+} 

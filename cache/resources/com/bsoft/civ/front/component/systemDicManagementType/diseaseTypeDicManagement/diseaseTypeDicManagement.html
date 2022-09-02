@@ -1,0 +1,192 @@
+<div class="disease-type-dic-management">
+    <!-- top-disease-type-table-con -->
+    <div class="top-disease-type-table-con">
+        <!-- title-con -->
+        <div class="title-con">
+            <span class="title-label">病种列表</span>
+            <el-button @click="importDiseaseType" type="primary" size="mini"
+                style="float: right; margin-top: 10px; margin-right: 10px;">导入
+            </el-button>
+        </div>
+        <!-- search-con -->
+        <div class="search-con">
+            <span class="search-label">状态 : </span>
+            <el-select v-model="searchDiseaseTypeStatus" size="mini" filterable>
+                <el-option v-for="(item, index) in diseaseTypeStatusSelect" :key="index" :label="item.label"
+                    :value="item.value">
+                </el-option>
+            </el-select>
+            <el-input class="search-input" placeholder="请输入编码或者名称检索" v-model="searchText" size="mini" clearable
+                style="width: 200px;" @keydown.enter.native="searchDiseaseType">
+                <i slot="suffix" class="iconfont civ-ico_opt_search" style="cursor: pointer;"
+                    @click="searchDiseaseType"></i>
+            </el-input>
+            <el-button @click="searchDiseaseType" type="primary" size="mini" style="float: right; margin-top: 10px;">
+                查询</el-button>
+        </div>
+        <!-- table-con -->
+        <div class="table-con">
+            <el-table v-loading="diseaseTypeTableLoading" class="disease-type-table" border
+                :highlight-current-row="true" @current-change="diseaseTypeTableChooseCurrentChange"
+                :data="diseaseTypeTableData" ref="diseaseTypeTable"
+                header-cell-style="background-color: #ebf4ff; color: #333;" height="calc(100% - 60px)"
+                @row-dblclick="diseaseTypeTableDblClick" @row-click="diseaseTypeTableClick">
+                <el-table-column type="index" label="序号" width="70" align="center"></el-table-column>
+                <el-table-column prop="diseaseCode" label="病种编码">
+                </el-table-column>
+                <el-table-column prop="diseaseName" label="病种名称">
+                </el-table-column>
+                <el-table-column width="80" label="操作" align="center">
+                    <template slot-scope="scope">
+                        <el-tooltip class="item" effect="dark" content="关联疾病" :enterable='false' placement="top">
+                            <span class="iconfont  civ-ico_opt_link"
+                                style="color: #0480ff; cursor: pointer; font-size: 14px;"
+                                @click='matchDisease(scope.row)'></span>
+                        </el-tooltip>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <el-pagination @size-change="diseaseTypeTableSizeChange" @current-change="diseaseTypeTableCurrentChange"
+                :pager-count="3" :page-sizes="[10, 20, 30, 50]" :page-size="diseaseTypeTableSearchPageSize"
+                layout="total, sizes, prev, pager, next, jumper" style="margin-top: 20px; float: right"
+                :total="diseaseTypeTableDataTotal" :current-page="diseaseTypeTableSearchPageNum">
+            </el-pagination>
+        </div>
+    </div>
+    <!-- bottom-disease-table-con -->
+    <div class="bottom-disease-table-con">
+        <!-- title-con -->
+        <div class="title-con">
+            <span class="title-label">关联疾病列表</span>
+        </div>
+        <!-- search-con -->
+        <div class="search-con">
+            <span class="search-label">机构 : </span>
+            <el-select v-model="searchOrgCode" size="mini" filterable>
+                <el-option v-for="(item, index) in searchOrgCodeSelect" :key="index" :label="item.organizationName"
+                    :value="item.organizationCode">
+                </el-option>
+            </el-select>
+            <el-input class="search-input" placeholder="请输入编码或者名称检索" v-model="diseaseTableSearchText" size="mini"
+                clearable style="width: 200px;" @keydown.enter.native="getDiseaseTableData">
+                <i slot="suffix" class="iconfont civ-ico_opt_search" style="cursor: pointer;"
+                    @click="getDiseaseTableData"></i>
+            </el-input>
+            <el-button @click="getDiseaseTableData" type="primary" size="mini" style="margin-left: 20px;">查询</el-button>
+        </div>
+        <div class="table-con">
+            <el-table v-loading="diseaseTableLoading" class="disease-table" border :data="diseaseTableData"
+                ref="diseaseTable" header-cell-style="background-color: #ebf4ff; color: #333;"
+                height="calc(100% - 60px)">
+                <el-table-column type="index" label="序号" width="70" align="center"></el-table-column>
+                <el-table-column prop="illnessCode" label="疾病编码">
+                </el-table-column>
+                <el-table-column prop="illnessName" label="疾病名称" :show-overflow-tooltip="true">
+                </el-table-column>
+                <el-table-column prop="organization" label="机构" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{formatOrganization(scope.row.organization)}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column width="80" label="操作" align="center">
+                    <template slot-scope="scope">
+                        <el-tooltip class="item" effect="dark" content="取消关联" :enterable='false' placement="top">
+                            <span class="iconfont civ-ico_opt_circle_close"
+                                style="color: #0480ff; cursor: pointer; font-size: 14px;"
+                                @click='cancelMatchDisease(scope.row)'></span>
+                        </el-tooltip>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <el-pagination @size-change="diseaseTableSizeChange" @current-change="diseaseTableCurrentChange"
+                :pager-count="3" :page-sizes="[10, 20, 30, 50]" :page-size="diseaseTableSearchPageSize"
+                layout="total, sizes, prev, pager, next, jumper" style="margin-top: 20px; float: right"
+                :total="diseaseTableDataTotal" :current-page="diseaseTableSearchPageNum">
+            </el-pagination>
+        </div>
+    </div>
+    <!-- change-disease-match-dialog -->
+    <el-dialog class="change-disease-match-dialog" title="病种关联" :visible.sync="changeDiseaseMatchDialogVisible"
+        width="1000px" :modal-append-to-body="false" :close-on-click-modal="false">
+        <div class="content">
+            <div class="right-disease-match-table-con">
+                <!-- search-con -->
+                <div class="search-con">
+                    <span class="search-label">机构 : </span>
+                    <el-select v-model="changeDiseaseMatchSearchOrgCode" size="mini" filterable>
+                        <el-option v-for="(item, index) in changeDiseaseMatchOrgCodeSelect" :key="index"
+                            :label="item.organizationName" :value="item.organizationCode">
+                        </el-option>
+                    </el-select>
+                    <el-input class="search-input" placeholder="请输入编码或者名称检索" v-model="changeDiseaseMatchSearchText"
+                        size="mini" clearable style="width: 200px;" @keydown.enter.native="searchDisease">
+                        <i slot="suffix" class="iconfont civ-ico_opt_search" style="cursor: pointer;"
+                            @click="searchDisease"></i>
+                    </el-input>
+                    <el-button @click="searchDisease" type="primary" size="mini" style="margin-left: 20px;">查询
+                    </el-button>
+                </div>
+                <!-- table-con -->
+                <div class="table-con">
+                    <el-table v-loading="checkDiseaseTableLoading" class="check-disease-table" border
+                        :data="checkDiseaseTableData" ref="checkDiseaseTable"
+                        header-cell-style="background-color: #ebf4ff; color: #333;" height="100%">
+                        <el-table-column type="selection" width="55" align="center">
+                        </el-table-column>
+                        <el-table-column type="index" label="序号" width="70" align="center"></el-table-column>
+                        <el-table-column prop="illnessCode" label="疾病编码">
+                        </el-table-column>
+                        <el-table-column prop="illnessName" label="疾病名称" :show-overflow-tooltip="true">
+                        </el-table-column>
+                        <el-table-column prop="organization" label="机构" width="180" :show-overflow-tooltip="true">
+                            <template slot-scope="scope">
+                                <span>{{formatOrganization(scope.row.organization)}}</span>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                    <el-pagination @size-change="checkDiseaseTableSizeChange"
+                        @current-change="checkDiseaseTableCurrentChange" :pager-count="5" :page-sizes="[10, 20, 30, 50]"
+                        :page-size="checkDiseaseTableSearchPageSize" layout="total, sizes, prev, pager, next, jumper"
+                        style="margin-top: 20px; float: right" :total="checkDiseaseTableDataTotal"
+                        :current-page="checkDiseaseTableSearchPageNum">
+                    </el-pagination>
+                </div>
+            </div>
+        </div>
+        <div slot="footer">
+            <el-button type="primary" @click="realchangeDiseaseMatch" size="small">保 存</el-button>
+            <el-button @click="changeDiseaseMatchDialogVisible = false" size="small">取 消</el-button>
+        </div>
+    </el-dialog>
+    <!-- import-disease-type-dialog -->
+    <el-dialog class="import-disease-type-dialog" title="导入" :visible.sync="importDiseaseTypeDialogVisible"
+        width="500px" :modal-append-to-body="false" :close-on-click-modal="false" @close="importDiseaseTypeDialogClose">
+        <div class="content">
+            <el-form :model="importDiseaseTypeFormData" class="import-disease-type-form"
+                :rules="importDiseaseTypeFormRules" ref="importDiseaseTypeForm">
+                <el-form-item class="import-disease-type-file-form-item" label-width="100px" label="病种文档 : "
+                    prop="fileList">
+                    <el-upload ref="importDiseaseTypeFileUpload" class="import-disease-type-file-upload"
+                        :http-request="realImportDiseaseType" accept=".xls" :limit="1" :on-change="handleChange"
+                        :auto-upload="false" :file-list="importDiseaseTypeFormData.fileList">
+                        <el-button size="mini" type="primary">点击上传</el-button>
+                        <el-button size="mini" type="text" @click.stop="downloadExcel" :loading="downloadExcelLoading">
+                            下载模版</el-button>
+                        <div slot="tip" class="el-upload__tip">只允许上传一份 excel 格式的文件</div>
+                    </el-upload>
+                </el-form-item>
+                <el-form-item class="import-disease-type-status-form-item" label-width="100px" label="导入类型 : "
+                    prop="status">
+                    <el-radio-group v-model="importDiseaseTypeFormData.status">
+                        <el-radio :label="1">清空导入</el-radio>
+                        <el-radio :label="0">覆盖导入</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+            </el-form>
+        </div>
+        <div slot="footer">
+            <el-button type="primary" @click="confirmImportDiseaseType" size="small">确 认</el-button>
+            <el-button @click="importDiseaseTypeDialogVisible = false" size="small">取 消</el-button>
+        </div>
+    </el-dialog>
+</div>

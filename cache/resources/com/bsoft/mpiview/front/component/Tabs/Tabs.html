@@ -1,0 +1,59 @@
+<div class="tabs-view" :class="{'history-tabs': history}">
+    <div class="item" @click="tabsChange(0)" :class="{'blue': activeIndex === 0 && !history,'part': !history}">
+        <div class="num">
+            <span>{{sourcePatientNum !== undefined ? sourcePatientNum : '--'}}</span>
+        </div>
+        <div class="desc">原始档案数<el-tooltip effect="dark" :content="tab1Tips" placement="top">
+            <span class="icon">
+                <i class="iconfont icon--s-icon_tips02"></i>
+            </span>
+        </el-tooltip></div>
+    </div>
+    <div class="item" @click="tabsChange(1)" :class="{'blue': activeIndex === 1 && !history,'part': !history}">
+        <div class="num">
+            <span>{{standardDataNum !== undefined ? standardDataNum : '--'}}</span>
+        </div>
+        <div class="desc">规范数据量<el-tooltip effect="dark" placement="top">
+            <div slot="content">
+                <div>原始患者档案数中符合校验规则的数据量;</div><div>注意：只分析采集的数据，不包含下方的数据分析</div>
+            </div>
+            <span class="icon">
+                <i class="iconfont icon--s-icon_tips02"></i>
+            </span>
+        </el-tooltip></div>
+        <div class="perc">
+            占数据总量：
+            <span class="orange">{{standardDataRate !== undefined ? standardDataRate : '--'}}%</span>
+        </div>
+    </div>
+    <div class="item" @click="tabsChange(2)" :class="{'blue': activeIndex === 2 && !history,'part': !history}">
+        <div class="num">
+            <span>{{patientNum !== undefined ? patientNum : '--'}}</span>
+        </div>
+        <div class="desc">患者主索引</div>
+        <div class="perc">
+            占数据总量：
+            <span class="orange">{{patientRate !== undefined ? patientRate : '--'}}%</span>
+        </div>
+    </div>
+    <div class="item" @click="tabsChange(3)" :class="{'blue': activeIndex === 3 && !history,'part': !history}">
+        <div class="num">
+            <span>{{mergeNum !== undefined ? mergeNum : '--'}}</span>
+        </div>
+        <div class="desc">患者合并</div>
+        <div class="perc">
+            占数据总量：
+            <span class="orange">{{mergeRate !== undefined ? mergeRate : '--'}}%</span>
+        </div>
+    </div>
+    <div class="item" @click="tabsChange(4)" :class="{'blue': activeIndex === 04&& !history,'part': !history}">
+        <div class="num">
+            <span>{{suspectNum !== undefined ? suspectNum : '--'}}</span>
+        </div>
+        <div class="desc">疑似主索引</div>
+        <div class="perc">
+            占数据总量：
+            <span class="orange">{{suspectRate !== undefined ? suspectRate : '--'}}%</span>
+        </div>
+    </div>
+</div>

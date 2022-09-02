@@ -1,0 +1,175 @@
+<div class="log mpi-container">
+    <div class="search-form">
+        <el-form :model="searchForm" ref="searchForm" label-width="100px" size="mini">
+            <div class="search-row">
+                <div>
+                    <el-form-item label="操作类型：" prop="type">
+                        <el-select v-model="searchForm.type" placeholder="请选择" style="width: 100%" clearable>
+                            <el-option v-for="item in operateEnums" :key="item.code" :label="item.name"
+                                :value="item.code">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                </div>
+                <div>
+                    <el-form-item label="患者姓名：" prop="name">
+                        <el-input v-model="searchForm.name" placeholder="请输入患者姓名" :maxlength="30"></el-input>
+                    </el-form-item>
+                </div>
+                <div>
+                    <el-form-item label="身份证号：" prop="idCard">
+                        <el-input v-model="searchForm.idCard" placeholder="请输入身份证号" :maxlength="20"></el-input>
+                    </el-form-item>
+                </div>
+                <div>
+                    <el-form-item label="联系电话：" prop="phone">
+                        <el-input v-model="searchForm.phone" placeholder="请输入联系电话" :maxlength="15"></el-input>
+                    </el-form-item>
+                </div>
+                <div>
+                    <el-form-item label="社保卡号：" prop="cardId">
+                        <el-input v-model="searchForm.cardId" placeholder="请输入社保卡号" :maxlength="20"></el-input>
+                    </el-form-item>
+                </div>
+                <div style="min-width: 460px">
+                    <el-form-item label="请求时间：" prop="name">
+                        <el-date-picker class="mr10" size="mini" v-model="searchForm.timeRange" type="datetimerange"
+                            range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" value-format="yyyy-MM-dd HH:mm:ss" :default-time="['00:00:00', '23:59:59']" popper-class="time-r">
+                        </el-date-picker>
+                    </el-form-item>
+                </div>
+                <div style="flex: 1">
+                    <el-form-item label-width="20px">
+                        <el-button @click="resetForm" class="fl">重置</el-button>
+                        <el-button type="primary" @click="formSearch" class="fl">查询</el-button>
+                        <el-checkbox class="fr" v-model="viewError" @change="filterList">仅查看错误</el-checkbox>
+                    </el-form-item>
+                </div>
+            </div>
+        </el-form>
+    </div>
+    <div class="log-table">
+        <el-table :data="tableData" tooltip-effect="dark" size="small" :header-cell-style="headClass"
+            class="search-table" @expand-change="expandChange" height="100%" :row-class-name="expandClass" @cell-dblclick="(row) => {this.toDetail(row.docId, row.status)}" v-loading="tableLoading"
+            element-loading-text="加载中"
+            element-loading-spinner="el-icon-loading"
+            element-loading-background="hsla(0,0%,100%,.9)" :cell-style="{color: '#333', fontSize: '14px'}">
+            <el-table-column type="expand" width="30">
+                <template slot-scope="scope">
+                    <el-table :data="innerTableData[scope.row.docId]" tooltip-effect="dark" size="small"
+                        :header-cell-style="headClass" @cell-dblclick="clickInnerDetail" :cell-style="{color: '#333', fontSize: '14px'}">
+                        <el-table-column prop="mpiId" label="主索引号" show-overflow-tooltip width="270">
+                        </el-table-column>
+                        <el-table-column prop="healthInsuranceCardId" label="社保卡号" show-overflow-tooltip min-width="60">
+                        </el-table-column>
+                        <el-table-column prop="name" label="患者姓名" show-overflow-tooltip min-width="80">
+                        </el-table-column>
+                        <el-table-column prop="idCard" label="身份证号" show-overflow-tooltip min-width="110">
+                        </el-table-column>
+                        <el-table-column prop="sexName" label="性别" min-width="50" show-overflow-tooltip>
+                            <template slot-scope="scope">
+                                <span>{{scope.row.sexName || scope.row.sex}}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="birthDate" label="出生日期" min-width="80">
+                            <template slot-scope="scope">
+                                <span>{{scope.row.birthDate && scope.row.birthDate.slice(0, 10)}}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="patientPhone" label="联系电话" min-width="80" show-overflow-tooltip>
+                        </el-table-column>
+                        <el-table-column prop="nationalityName" label="国籍" width="50" show-overflow-tooltip>
+                            <template slot-scope="scope">
+                                <span>{{scope.row.nationalityName || scope.row.nationality}}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="操作" width="50">
+                            <template slot-scope="scope">
+                                <el-tooltip effect="dark" content="详情" placement="bottom">
+                                    <span class="blue hand" @click="toInnerDetail(scope.row)">
+                                        <i class="iconfont icon-zidianxiang"></i>
+                                    </span>
+                                </el-tooltip>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </template>
+            </el-table-column>
+            <el-table-column prop="type" label="操作类型" show-overflow-tooltip width="80">
+                <template slot-scope="scope">
+                    <span>{{scope.row.type | operateFilter}}</span>
+                </template>
+            </el-table-column>
+            <el-table-column prop="operateTime" label="操作时间" show-overflow-tooltip width="150">
+            </el-table-column>
+            <el-table-column prop="mpiId" label="主索引号" show-overflow-tooltip width="240">
+            </el-table-column>
+            <el-table-column prop="socialCardId" label="社保卡号" show-overflow-tooltip>
+            </el-table-column>
+            <el-table-column prop="healthCardId" label="健康卡号" show-overflow-tooltip>
+            </el-table-column>
+            <el-table-column prop="name" label="患者姓名"  show-overflow-tooltip min-width="80">
+            </el-table-column>
+            <el-table-column prop="sexName" label="性别" min-width="50" show-overflow-tooltip>
+                <template slot-scope="scope">
+                    <span>{{scope.row.sexName}}</span>
+                </template>
+            </el-table-column>
+            <el-table-column prop="birthDate" label="出生日期" width="90" show-overflow-tooltip>
+                <template slot-scope="scope">
+                    <span>{{scope.row.birthDate && scope.row.birthDate.slice(0, 10)}}</span>
+                </template>
+            </el-table-column>
+            <el-table-column prop="idCard" label="身份证号" show-overflow-tooltip>
+            </el-table-column>
+            <el-table-column prop="phone" label="联系电话" show-overflow-tooltip>
+            </el-table-column>
+            <el-table-column label="操作ID" class-name="operate-tip">
+                <template slot-scope="scope">
+                    <el-tooltip effect="dark" content="详情" placement="bottom">
+                        <span class="hand" :class="scope.row.status === '1' ? 'blue' : 'red'"
+                        @click="toDetail(scope.row.docId, scope.row.status)">
+                        {{scope.row.docId}}
+                    </span>
+                    </el-tooltip>
+                </template>
+            </el-table-column>
+        </el-table>
+    </div>
+
+    <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageNo"
+        :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
+    </el-pagination>
+    <el-dialog :visible.sync="detailDialog" width="60%" title="详情" :modal-append-to-body="false"
+        :close-on-click-modal="false" @close="cancelDetail" class="detail-dialog">
+        <el-row v-if="detailDialog" class="detail-row">
+            <el-col span="12">
+                <el-row class="title">
+                    请求数据
+                </el-row>
+                <el-row class="contentt-row">
+                    <textarea ref="inputCode" :value="inputValue"></textarea>
+                </el-row>
+            </el-col>
+            <el-col span="12">
+                <el-row class="title bl">
+                    返回数据
+                </el-row>
+                <el-row :class="{'red': isError}" class="contentt-row">
+                    <textarea ref="outputCode" :value="outputValue"></textarea>
+                </el-row>
+            </el-col>
+        </el-row>
+        <!-- <span slot="footer" class="dialog-footer"> -->
+            <!-- <el-button @click="cancelDetail" size="mini">取 消</el-button> -->
+        <!-- </span> -->
+    </el-dialog>
+    <!-- 详情弹窗 -->
+    <el-dialog :visible.sync="innerDetailDialog" width="80%" title="个人基本信息" :modal-append-to-body="false"
+        :close-on-click-modal="false" @close="cancelInnerDetail" class="scroll-dialog detail-dialog" top="10vh">
+        <main-index-detail :baseInfo="baseInfo" v-if="innerDetailDialog"></main-index-detail>
+        <span slot="footer" class="dialog-footer">
+            <!-- <el-button @click="cancelInnerDetail" size="mini">取 消</el-button> -->
+        </span>
+    </el-dialog>
+</div>

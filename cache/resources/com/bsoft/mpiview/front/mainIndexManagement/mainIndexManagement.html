@@ -1,0 +1,126 @@
+<div class="mainIndex-container mpi-container">
+    <div class="search-form">
+        <el-form :model="searchForm" ref="searchForm" label-width="100px" size="mini">
+            <div class="search-row">
+                <div>
+                    <el-form-item label="患者姓名：" prop="name">
+                        <el-input v-model="searchForm.name" placeholder="请输入患者姓名" :maxlength="30"></el-input>
+                    </el-form-item>
+                </div>
+                <div>
+                    <el-form-item label="身份证号：" prop="idCard">
+                        <el-input v-model="searchForm.idCard" placeholder="请输入身份证号" :maxlength="20"></el-input>
+                    </el-form-item>
+                </div>
+                <div>
+                    <el-form-item label="联系电话：" prop="patientPhone">
+                        <el-input v-model="searchForm.patientPhone" placeholder="请输入联系电话" :maxlength="15"></el-input>
+                    </el-form-item>
+                </div>
+                <div>
+                    <el-form-item label="社保卡号：" prop="cardNo">
+                        <el-input v-model="searchForm.cardNo" placeholder="请输入社保卡号" :maxlength="20"></el-input>
+                    </el-form-item>
+                </div>
+                <div class="btns">
+                    <el-form-item label-width="20px">
+                        <el-button @click="resetForm" class="fl">重置</el-button>
+                        <el-button type="primary" @click="formSearch" class="fl">查询</el-button>
+                        <el-button type="primary" @click="handleMerge" class="fr" :disabled="mergeBtnDisabled">合并
+                        </el-button>
+                    </el-form-item>
+                </div>
+            </div class="search-row">
+        </el-form>
+    </div>
+    <div class="mainIndex-table">
+        <el-table ref="multipleTable" :data="tableData" tooltip-effect="dark" @selection-change="selectTable" size="small"
+        :header-cell-style="headClass" class="search-table" height="100%" @cell-dblclick="(row) => {this.toDetail(row.mpiId)}" v-loading="tableLoading"
+        element-loading-text="加载中"
+        element-loading-spinner="el-icon-loading"
+        element-loading-background="hsla(0,0%,100%,.9)" :cell-style="{color: '#333', fontSize: '14px'}">
+        <el-table-column type="selection" width="55">
+        </el-table-column>
+        <el-table-column type="index" width="50" label="序号">
+        </el-table-column>
+        <el-table-column prop="mpiId" label="主索引号" show-overflow-tooltip min-width="220">
+        </el-table-column>
+        <el-table-column prop="healthInsuranceCardId" label="社保卡号" show-overflow-tooltip min-width="100">
+        </el-table-column>
+        <el-table-column prop="name" label="患者姓名"  min-width="70" show-overflow-tooltip>
+        </el-table-column>
+        <el-table-column prop="sexName" label="性别" min-width="50">
+            <template slot-scope="scope">
+                <span>{{scope.row.sexName || scope.row.sex }}</span>
+            </template>
+        </el-table-column>
+        <el-table-column prop="birthDate" label="出生日期" min-width="90">
+            <template slot-scope="scope">
+                <span>{{scope.row.birthDate && scope.row.birthDate.slice(0, 10)}}</span>
+            </template>
+        </el-table-column>
+        <el-table-column prop="idCard" label="身份证号" show-overflow-tooltip min-width="120">
+        </el-table-column>
+        <el-table-column prop="patientPhone" label="联系电话" min-width="100">
+        </el-table-column>
+        <el-table-column label="操作" class-name="action">
+            <template slot-scope="scope">
+                <el-tooltip effect="dark" content="详情" placement="bottom">
+                    <span class="operate-icon operate-icon1 hand" @click="toDetail(scope.row.mpiId)">
+                        <i class="iconfont icon-zidianxiang"></i>
+                    </span>
+                </el-tooltip>
+                <el-tooltip effect="dark" content="交叉索引" placement="bottom">
+                    <span class="operate-icon hand" @click="toIntersectRecord(scope.row)">
+                        <i class="iconfont icon--s-icon_jiaochasuoying"></i>
+                    </span>
+                </el-tooltip>
+                <el-tooltip effect="dark" content="轨迹" placement="bottom">
+                    <span class="operate-icon hand" @click="toPatientTrack(scope.row.mpiId)">
+                        <i class="iconfont icon--s-icon_guiji"></i>
+                    </span>
+                </el-tooltip>
+            </template>
+        </el-table-column>
+    </el-table>
+    </div>
+    <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageNo"
+        :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
+    </el-pagination>
+    <!-- 合并确认弹窗 -->
+    <el-dialog :visible.sync="mergeConfirmDialog" width="80%" title="合并确认" :modal-append-to-body="false"
+        :close-on-click-modal="false" @close="cancelMergeConfirm" class="scroll-dialog dialog-footer-shadow">
+        <merge-confirm :mpiIds="selectIdList" v-if="mergeConfirmDialog"></merge-confirm>
+        <span slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="confirmNext" size="mini">下一步</el-button>
+            <el-button @click="cancelMergeConfirm" size="mini">取 消</el-button>
+        </span>
+    </el-dialog>
+    <!-- 选择主记录弹窗 -->
+    <el-dialog :visible.sync="mergeSelectDialog" width="80%" title="请选择一个主记录" :modal-append-to-body="false"
+        :close-on-click-modal="false" @close="cancelSelectMain" class="scroll-dialog dialog-footer-shadow">
+        <merge-select :mpiIds="selectIdList" v-if="mergeSelectDialog" ref="mergeSelect" @submitMerge="submitMerge"></merge-select>
+        <span slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="selectMainLast" size="mini">上一步</el-button>
+            <el-button type="primary" @click="confirmSelectMain" size="mini">确认</el-button>
+            <el-button @click="cancelSelectMain" size="mini">取 消</el-button>
+        </span>
+    </el-dialog>
+    <!-- 详情弹窗 -->
+    <el-dialog :visible.sync="detailDialog" width="80%" title="个人基本信息" :modal-append-to-body="false"
+        :close-on-click-modal="false" @close="cancelDetail" class="scroll-dialog detail-dialog" top="10vh">
+        <main-index-detail :mpiId="mpiId" v-if="detailDialog"></main-index-detail>
+        <span slot="footer" class="dialog-footer">
+        </span>
+    </el-dialog>
+    <!-- 交叉索引记录抽屉 -->
+    <el-drawer title="交叉索引记录" :visible.sync="intersectDrawer" direction="rtl" :before-close="cancelIntersect" :append-to-body="true"
+        :modal-append-to-body="false" size="80%" class="drawer">
+        <intersect-record :mpiId="mpiId" v-if="intersectDrawer"></intersect-record>
+    </el-drawer>
+    <!-- 患者轨迹抽屉 -->
+    <el-drawer title="患者轨迹" ref="patientTrack" :visible.sync="patientTrackDrawer" direction="rtl" :before-close="closePatientTrack"
+        :modal-append-to-body="false" :append-to-body="true" size="50%" class="drawer track">
+        <patient-track :mpiId="mpiId" v-if="patientTrackDrawer"></patient-track>
+    </el-drawer>
+</div>

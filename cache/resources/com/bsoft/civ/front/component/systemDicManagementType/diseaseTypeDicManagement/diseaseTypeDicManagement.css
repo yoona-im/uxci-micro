@@ -1,0 +1,114 @@
+.disease-type-dic-management {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.disease-type-dic-management .top-disease-type-table-con {
+    width: calc(50% - 5px);
+    height: 100%;
+    margin-right: 5px;
+    background: #fff;
+    float: left;
+}
+
+.disease-type-dic-management .top-disease-type-table-con .title-con {
+    width: 100%;
+    height: 50px;
+    line-height: 50px;
+}
+
+.disease-type-dic-management .top-disease-type-table-con .title-con .title-label {
+    display: inline-block;
+    text-indent: 10px;
+    font-weight: bold;
+}
+
+.disease-type-dic-management .top-disease-type-table-con .search-con {
+    width: 100%;
+    height: 50px;
+    line-height: 50px;
+    padding: 0 10px 0 10px;
+}
+
+.disease-type-dic-management .top-disease-type-table-con .table-con {
+    width: 100%;
+    height: calc(100% - 100px);
+    padding: 10px;
+}
+
+.disease-type-dic-management .bottom-disease-table-con {
+    width: calc(50% - 5px);
+    height: 100%;
+    margin-left: 5px;
+    background: #fff;
+    float: right;
+}
+
+.disease-type-dic-management .bottom-disease-table-con .title-con {
+    width: 100%;
+    height: 50px;
+    line-height: 50px;
+}
+
+.disease-type-dic-management .bottom-disease-table-con .title-con .title-label {
+    display: inline-block;
+    text-indent: 10px;
+    font-weight: bold;
+}
+
+.disease-type-dic-management .bottom-disease-table-con .search-con {
+    width: 100%;
+    height: 50px;
+    line-height: 50px;
+    padding: 0 10px 0 10px;
+}
+
+.disease-type-dic-management .bottom-disease-table-con .table-con {
+    width: 100%;
+    height: calc(100% - 100px);
+    padding: 10px;
+}
+
+.disease-type-dic-management .right-disease-match-table-con .search-con {
+    width: 100%;
+    height: 50px;
+    line-height: 50px;
+    padding: 0;
+}
+
+.disease-type-dic-management .right-disease-match-table-con .table-con {
+    width: 100%;
+    height: calc(100% - 100px);
+    padding: 10px 0 10px 0;
+}
+
+.disease-type-dic-management .change-disease-match-dialog .content {
+    overflow: hidden;
+    height: 400px;
+}
+
+.disease-type-dic-management .change-disease-match-dialog .right-disease-match-table-con {
+    width: 100%;
+    height: 100%;
+}
+
+.disease-type-dic-management .change-disease-match-dialog .folder-icon {
+    color: #fcca1b;
+}
+
+.import-disease-type-dialog input[type=file] {
+    display: none;
+}
+
+.import-disease-type-dialog .el-upload__tip {
+    color: #fc5154;
+}
+
+.import-disease-type-dialog .import-disease-type-org-form-item .el-select {
+    width: 100%;
+}
+
+.import-disease-type-dialog .import-disease-type-status-form-item .el-radio__label {
+    font-size: 12px;
+}

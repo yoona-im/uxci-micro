@@ -1,0 +1,34 @@
+{
+  "ServerPort": 8080,
+  "watch": true,
+  "libRoot": "lib/",
+  "mockHome": "mock/",
+  "workflows": [
+    {
+      "dst": "dist/"
+    },{
+      "dst": "web/"
+    },
+    {
+      "src": "src/",
+      "dst": "dist/",
+      "tasks": [{
+        "id": "iife",
+        "props": {
+          "mapOffsetC": 61,
+          "mapOffsetR": 0
+        }}, "copy"]
+    }
+  ],
+  "importMaps": {
+    "plugin-vue2:normalizer": "@/lib/vue2/normalizer.m.js"
+  },
+  "defines": {
+    "sfcCompiler": "lib/sfc/vite-vue2.js"
+  },
+  "backend": {
+    "enable": true,
+    "url": "http://10.10.2.60:8081/hip-bbp-extend",
+    "cacheDir": "cache/"
+  }
+}
